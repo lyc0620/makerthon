@@ -57,4 +57,4 @@ python -m pytest tests/test_route.py
 ## 아직 안 된 것
 - 기울기(DEM): `ascent_m`, `descent_m`은 `null`, `slope` 파라미터는 무시
 - 캠퍼스 내부 일부 길이 OSM에 없을 수 있음 → 확인 후 `walk_graph.json`에 수동 보강
-- 프론트 TSX는 Node가 없는 환경에서 작성해 **아직 컴파일 확인 전**
+- 프론트 TSX 타입 검사는 통과 (TypeScript strict, react 19, react-map-gl 8, maplibre-gl 6, zustand 5, TanStack Query 5). 실제 Vite 빌드·화면 확인은 통합 프론트에서 필요
