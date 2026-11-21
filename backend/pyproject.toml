@@ -1,0 +1,39 @@
+[project]
+name = "hyeonpung-map-backend"
+version = "0.1.0"
+description = "현풍 지도 백엔드 — DB 파트(맛집·제보·밥친구)"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "sqlmodel>=0.0.22",
+    "alembic>=1.13",
+    "pydantic-settings>=2.4",
+    "httpx>=0.27",
+    "pyjwt>=2.9",
+    "tzdata>=2024.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.6",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-p no:cacheprovider"
+# starlette TestClient가 httpx2로 옮기라는 안내 경고예요 (지금 버전에서는 동작에 문제 없어요)
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008"]
