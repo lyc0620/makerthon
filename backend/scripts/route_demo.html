@@ -50,7 +50,8 @@
   <div id="msg">지도에서 출발지를 클릭하세요.</div>
 </div>
 <script>
-const API = "/api/v1";
+// 파일을 직접 열면(file:, data: 등) 상대 경로가 안 되므로 개발 서버 주소로 보낸다
+const API = location.protocol.startsWith("http") ? "/api/v1" : "http://localhost:8000/api/v1";
 const COLORS = ["#2563eb", "#16a34a", "#ea580c"];
 let tab = "route", from = null, runStart = [35.7003, 128.4576], courses = [], selected = 0;
 const markers = [];
@@ -97,7 +98,12 @@ function draw(features) {
 function fmtMin(s) { return Math.round(s / 60) + "분"; }
 
 async function api(path) {
-  const r = await fetch(API + path);
+  let r;
+  try {
+    r = await fetch(API + path);
+  } catch {
+    throw new Error("API 서버에 연결할 수 없습니다. backend 폴더에서 python -m uvicorn scripts.dev_route_server:app --port 8000 을 실행한 뒤 http://localhost:8000/ 으로 여세요.");
+  }
   const body = await r.json();
   if (!r.ok) throw new Error(body.error ? body.error.message : r.statusText);
   return body;
