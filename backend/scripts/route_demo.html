@@ -24,6 +24,22 @@
   #msg { margin-top: 8px; color: #333; line-height: 1.5; }
   .course { padding: 6px 8px; border-radius: 6px; margin-top: 4px; cursor: pointer; border-left: 6px solid; background: #f8f8f8; }
   .course.sel { background: #e8efff; }
+  .row input[type=search] { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; }
+  #plan {
+    position: absolute; left: 12px; right: 12px; bottom: 12px; max-width: 560px; z-index: 1;
+    background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.18); padding: 10px; font-size: 13px;
+  }
+  #plan .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px; }
+  #plan .imgwrap { position: relative; width: 100%; }
+  #plan img { width: 100%; display: block; border-radius: 6px; }
+  #plan .dot {
+    position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%;
+    border: 4px solid #dc2626; background: rgba(220,38,38,.15); animation: pulse 1.2s infinite;
+  }
+  @keyframes pulse { 50% { transform: scale(1.35); opacity: .6; } }
+  #plan .src { color: #777; font-size: 11px; margin-top: 4px; }
+  [hidden] { display: none !important; }  /* #plan img의 display:block이 hidden을 덮지 않게 */
+  #plan button { padding: 6px 10px; border: 1px solid #ccc; border-radius: 8px; background: #f6f6f6; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -32,6 +48,13 @@
   <div class="tabs">
     <button id="tab-route" class="on">길찾기</button>
     <button id="tab-run">러닝 코스</button>
+    <button id="tab-room">강의실</button>
+  </div>
+  <div id="room-ui" hidden>
+    <div class="row">
+      <input id="q" type="search" placeholder="예: L21, E7 233, 멀티미디어, 도서관" />
+      <button id="find">검색</button>
+    </div>
   </div>
   <div id="route-ui">
     <div class="row">
@@ -48,6 +71,14 @@
   </div>
   <div class="row"><label><input id="three" type="checkbox" /> 3D 건물</label></div>
   <div id="msg">지도에서 출발지를 클릭하세요.</div>
+</div>
+<div id="plan" hidden>
+  <div class="head">
+    <div id="plan-title"></div>
+    <div><span id="plan-3d"></span> <button id="plan-route">여기까지 길찾기</button> <button id="plan-close">닫기</button></div>
+  </div>
+  <div class="imgwrap"><img id="plan-img" alt="층별 안내도" /><div class="dot" id="plan-dot"></div></div>
+  <div class="src" id="plan-srcline">안내도 출처: <a id="plan-src" target="_blank" rel="noopener">DGIST School Facilities</a></div>
 </div>
 <script>
 // 파일을 직접 열면(file:, data: 등) 상대 경로가 안 되므로 개발 서버 주소로 보낸다
@@ -111,6 +142,7 @@ async function api(path) {
 
 map.on("click", async (e) => {
   const { lat, lng } = e.lngLat;
+  if (tab === "room") return;
   if (tab === "run") {
     runStart = [lat, lng];
     clearMarkers(); addMarker(lat, lng, "#111");
@@ -156,17 +188,91 @@ document.getElementById("go").onclick = async () => {
   } catch (err) { msg("⚠ " + err.message); }
 };
 
+// ---------- 강의실 검색 ----------
+const GATE = [35.7003, 128.4576];
+let roomResults = [], roomSel = null;
+
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function roomLabel(it) {
+  const head = it.code ? `${it.building.name.split(" ")[0]} ${it.code}` : it.building.name;
+  return `${head}${it.name ? " · " + it.name : ""}${it.floor_label ? " (" + it.floor_label + ")" : ""}`;
+}
+
+async function findRoom() {
+  const q = document.getElementById("q").value.trim();
+  if (!q) return;
+  msg("검색 중...");
+  try {
+    const r = await api(`/campus/search?q=${encodeURIComponent(q)}`);
+    roomResults = r.items;
+    if (!roomResults.length) { msg("결과가 없습니다. 예: L21, E7 233, 멀티미디어"); return; }
+    msg(roomResults.map((it, i) =>
+      `<div class="course" style="border-color:${it.type === "room" ? "#dc2626" : "#2563eb"}" data-r="${i}">${esc(roomLabel(it))}</div>`
+    ).join(""));
+    document.querySelectorAll("[data-r]").forEach(el => el.onclick = () => showRoom(roomResults[+el.dataset.r]));
+    showRoom(roomResults[0]);
+  } catch (err) { msg("⚠ " + err.message); }
+}
+
+function showRoom(it) {
+  roomSel = it;
+  const b = it.building;
+  clearMarkers(); draw([]);
+  addMarker(b.lat, b.lng, "#dc2626");
+  map.flyTo({ center: [b.lng, b.lat], zoom: 17.5 });
+  const card = document.getElementById("plan");
+  document.getElementById("plan-title").innerHTML = `<b>${esc(roomLabel(it))}</b>`;
+  const img = document.getElementById("plan-img"), dot = document.getElementById("plan-dot");
+  document.getElementById("plan-srcline").hidden = !it.plan;
+  if (it.plan) {
+    img.hidden = false; dot.hidden = false;
+    img.src = API.replace(/\/api\/v1$/, "") + it.plan.image_url;  // image_url은 /api/v1/... 경로
+    dot.style.left = (it.x / it.plan.width * 100) + "%";
+    dot.style.top = (it.y / it.plan.height * 100) + "%";
+    document.getElementById("plan-src").href = it.plan.source_url;
+  } else {
+    img.hidden = true; dot.hidden = true;
+    document.getElementById("plan-title").innerHTML += "<br/>이 층은 안내도가 없어 건물 위치만 표시합니다.";
+  }
+  // 3D 스캔 버튼 (E8 3층 등): 스플랫 / 점 구름
+  const origin = API.replace(/\/api\/v1$/, "");
+  document.getElementById("plan-3d").innerHTML = (it.scans || []).map(s =>
+    `<button onclick="window.open('${origin}${s.viewer_url}', '_blank')" title="${esc(s.title)}">3D ${esc(s.title.replace(/^3층\s*/, ""))}</button>`
+  ).join(" ");
+  card.hidden = false;
+}
+
+document.getElementById("find").onclick = findRoom;
+document.getElementById("q").onkeydown = (e) => { if (e.key === "Enter") findRoom(); };
+document.getElementById("plan-close").onclick = () => { document.getElementById("plan").hidden = true; };
+document.getElementById("plan-route").onclick = async () => {
+  if (!roomSel) return;
+  const b = roomSel.building;
+  try {
+    const r = await api(`/route?from=${GATE[0]},${GATE[1]}&to=${b.lat},${b.lng}&mode=walk`);
+    draw([{ type: "Feature", geometry: r.geometry, properties: { color: COLORS[0], sel: true } }]);
+    addMarker(GATE[0], GATE[1], "#16a34a");
+    map.fitBounds([[Math.min(GATE[1], b.lng) - .001, Math.min(GATE[0], b.lat) - .001],
+                   [Math.max(GATE[1], b.lng) + .001, Math.max(GATE[0], b.lat) + .001]], { padding: 60 });
+    document.getElementById("plan-title").innerHTML =
+      `<b>${esc(roomLabel(roomSel))}</b><br/>정문에서 ${(r.distance_m / 1000).toFixed(2)}km · 걸어서 약 ${fmtMin(r.duration_s)}`;
+  } catch (err) { msg("⚠ " + err.message); }
+};
+
 function setTab(t) {
   tab = t; from = null; courses = []; clearMarkers(); draw([]);
-  document.getElementById("tab-route").classList.toggle("on", t === "route");
-  document.getElementById("tab-run").classList.toggle("on", t === "run");
-  document.getElementById("route-ui").hidden = t !== "route";
-  document.getElementById("run-ui").hidden = t !== "run";
+  document.getElementById("plan").hidden = true;
+  for (const k of ["route", "run", "room"]) {
+    document.getElementById("tab-" + k).classList.toggle("on", t === k);
+    document.getElementById(k + "-ui").hidden = t !== k;
+  }
   if (t === "run") { addMarker(runStart[0], runStart[1], "#111"); msg("지도 클릭으로 출발점 변경 (기본: DGIST 정문)"); }
+  else if (t === "room") { msg("강의실 번호나 이름을 검색하세요."); document.getElementById("q").focus(); }
   else msg("지도에서 출발지를 클릭하세요.");
 }
 document.getElementById("tab-route").onclick = () => setTab("route");
 document.getElementById("tab-run").onclick = () => setTab("run");
+document.getElementById("tab-room").onclick = () => setTab("room");
 document.getElementById("clear").onclick = () => setTab("route");
 document.getElementById("three").onchange = (e) => {
   if (map.getLayer("buildings-3d"))

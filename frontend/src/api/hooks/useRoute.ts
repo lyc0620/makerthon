@@ -1,6 +1,6 @@
 // 길찾기 / 러닝 루트 TanStack Query 훅 (담당: 김도현)
 import { useQuery } from "@tanstack/react-query";
-import type { LatLng, ListResponse, RouteMode, RouteResult, RunningRoute } from "../routeTypes";
+import type { CampusSearchItem, LatLng, ListResponse, RouteMode, RouteResult, RunningRoute } from "../routeTypes";
 
 // TODO(통합): api/client.ts가 생기면 그쪽 fetch 래퍼로 교체
 async function getJson<T>(path: string): Promise<T> {
@@ -21,6 +21,17 @@ export function useRoute(from: LatLng | null, to: LatLng | null, mode: RouteMode
     enabled: !!from && !!to,
     staleTime: Infinity, // 같은 입력이면 다시 부르지 않음
     retry: false, // 400(보행로에서 멂)·404는 재시도해도 같음
+  });
+}
+
+export function useCampusSearch(q: string) {
+  const query = q.trim();
+  return useQuery({
+    queryKey: ["campus-search", query],
+    queryFn: () => getJson<ListResponse<CampusSearchItem>>(`/campus/search?q=${encodeURIComponent(query)}`),
+    enabled: query.length > 0,
+    staleTime: Infinity, // seed 데이터라 바뀌지 않음
+    retry: false,
   });
 }
 

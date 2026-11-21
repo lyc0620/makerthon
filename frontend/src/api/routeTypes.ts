@@ -32,3 +32,28 @@ export type ListResponse<T> = {
 };
 
 export type LatLng = { lat: number; lng: number };
+
+// 명세 6.8 강의실 검색
+export type FloorPlanRef = {
+  id: string;
+  image_url: string; // /api/v1/campus/floor-plans/{id}/image (백엔드 중계)
+  source_image_url: string;
+  width: number;
+  height: number;
+  source_url: string;
+};
+
+export type CampusSearchItem = {
+  type: "room" | "building";
+  id: string;
+  code: string | null;
+  name: string | null;
+  floor: string | null;
+  floor_label: string | null;
+  building: { id: string; name: string; lat: number; lng: number };
+  plan: FloorPlanRef | null;
+  x: number | null; // 안내도 이미지 안의 픽셀 위치
+  y: number | null;
+  // 영상으로 복원한 3D 스캔 (splat: 가우시안 스플래팅, points: 점 구름)
+  scans: { id: string; title: string; viewer: "splat" | "points"; viewer_url: string }[];
+};

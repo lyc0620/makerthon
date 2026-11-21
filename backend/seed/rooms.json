@@ -1,0 +1,2542 @@
+[
+ {
+  "id": "room_E2_215",
+  "building_id": "bld_E2",
+  "code": "215",
+  "name": "노벨상 실험실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 65,
+  "y": 75
+ },
+ {
+  "id": "room_E2_216",
+  "building_id": "bld_E2",
+  "code": "216",
+  "name": "광학 실험실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 167,
+  "y": 75
+ },
+ {
+  "id": "room_E2_217",
+  "building_id": "bld_E2",
+  "code": "217",
+  "name": "고체물리 실험실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 262,
+  "y": 75
+ },
+ {
+  "id": "room_E2_218",
+  "building_id": "bld_E2",
+  "code": "218",
+  "name": "물리공작실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 405,
+  "y": 75
+ },
+ {
+  "id": "room_E2_219",
+  "building_id": "bld_E2",
+  "code": "219",
+  "name": "고전역학/전자기학 실험실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 565,
+  "y": 75
+ },
+ {
+  "id": "room_E2_220",
+  "building_id": "bld_E2",
+  "code": "220",
+  "name": "실험준비실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 720,
+  "y": 75
+ },
+ {
+  "id": "room_E2_221",
+  "building_id": "bld_E2",
+  "code": "221",
+  "name": "전기회로 실험실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 500,
+  "y": 183
+ },
+ {
+  "id": "room_E2_214",
+  "building_id": "bld_E2",
+  "code": "214",
+  "name": "회의실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 175,
+  "y": 225
+ },
+ {
+  "id": "room_E2_201",
+  "building_id": "bld_E2",
+  "code": "201",
+  "name": "교류라운지",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 855,
+  "y": 235
+ },
+ {
+  "id": "room_E2_213",
+  "building_id": "bld_E2",
+  "code": "213",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 153,
+  "y": 325
+ },
+ {
+  "id": "room_E2_212",
+  "building_id": "bld_E2",
+  "code": "212",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 197,
+  "y": 325
+ },
+ {
+  "id": "room_E2_211",
+  "building_id": "bld_E2",
+  "code": "211",
+  "name": "이준석 교수실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 242,
+  "y": 325
+ },
+ {
+  "id": "room_E2_210",
+  "building_id": "bld_E2",
+  "code": "210",
+  "name": "Daniel 교수실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 288,
+  "y": 325
+ },
+ {
+  "id": "room_E2_209",
+  "building_id": "bld_E2",
+  "code": "209",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 334,
+  "y": 325
+ },
+ {
+  "id": "room_E2_208",
+  "building_id": "bld_E2",
+  "code": "208",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 380,
+  "y": 325
+ },
+ {
+  "id": "room_E2_206",
+  "building_id": "bld_E2",
+  "code": "206",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 585,
+  "y": 325
+ },
+ {
+  "id": "room_E2_205",
+  "building_id": "bld_E2",
+  "code": "205",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 640,
+  "y": 325
+ },
+ {
+  "id": "room_E2_204",
+  "building_id": "bld_E2",
+  "code": "204",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 700,
+  "y": 325
+ },
+ {
+  "id": "room_E2_203",
+  "building_id": "bld_E2",
+  "code": "203",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 758,
+  "y": 325
+ },
+ {
+  "id": "room_E2_202",
+  "building_id": "bld_E2",
+  "code": "202",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E2_2_1",
+  "x": 818,
+  "y": 325
+ },
+ {
+  "id": "room_E3_217",
+  "building_id": "bld_E3",
+  "code": "217",
+  "name": "서버실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 183,
+  "y": 55
+ },
+ {
+  "id": "room_E3_218",
+  "building_id": "bld_E3",
+  "code": "218",
+  "name": "통계실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 270,
+  "y": 55
+ },
+ {
+  "id": "room_E3_219",
+  "building_id": "bld_E3",
+  "code": "219",
+  "name": "전산연구실1",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 358,
+  "y": 55
+ },
+ {
+  "id": "room_E3_220",
+  "building_id": "bld_E3",
+  "code": "220",
+  "name": "전산연구실2",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 492,
+  "y": 55
+ },
+ {
+  "id": "room_E3_221",
+  "building_id": "bld_E3",
+  "code": "221",
+  "name": "전산연구실3",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 645,
+  "y": 55
+ },
+ {
+  "id": "room_E3_222",
+  "building_id": "bld_E3",
+  "code": "222",
+  "name": "컴퓨터실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 755,
+  "y": 55
+ },
+ {
+  "id": "room_E3_224",
+  "building_id": "bld_E3",
+  "code": "224",
+  "name": "세미나(중)",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 482,
+  "y": 168
+ },
+ {
+  "id": "room_E3_223",
+  "building_id": "bld_E3",
+  "code": "223",
+  "name": "세미나(소)",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 585,
+  "y": 168
+ },
+ {
+  "id": "room_E3_216",
+  "building_id": "bld_E3",
+  "code": "216",
+  "name": "회의실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 186,
+  "y": 205
+ },
+ {
+  "id": "room_E3_201",
+  "building_id": "bld_E3",
+  "code": "201",
+  "name": "교류라운지",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 870,
+  "y": 212
+ },
+ {
+  "id": "room_E3_215",
+  "building_id": "bld_E3",
+  "code": "215",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 28,
+  "y": 300
+ },
+ {
+  "id": "room_E3_214",
+  "building_id": "bld_E3",
+  "code": "214",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 73,
+  "y": 300
+ },
+ {
+  "id": "room_E3_213",
+  "building_id": "bld_E3",
+  "code": "213",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 118,
+  "y": 300
+ },
+ {
+  "id": "room_E3_212",
+  "building_id": "bld_E3",
+  "code": "212",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 167,
+  "y": 300
+ },
+ {
+  "id": "room_E3_211",
+  "building_id": "bld_E3",
+  "code": "211",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 215,
+  "y": 300
+ },
+ {
+  "id": "room_E3_210",
+  "building_id": "bld_E3",
+  "code": "210",
+  "name": "안소영 교수실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 264,
+  "y": 300
+ },
+ {
+  "id": "room_E3_209",
+  "building_id": "bld_E3",
+  "code": "209",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 311,
+  "y": 300
+ },
+ {
+  "id": "room_E3_208",
+  "building_id": "bld_E3",
+  "code": "208",
+  "name": "리빙룸",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 375,
+  "y": 317
+ },
+ {
+  "id": "room_E3_207",
+  "building_id": "bld_E3",
+  "code": "207",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 463,
+  "y": 300
+ },
+ {
+  "id": "room_E3_206",
+  "building_id": "bld_E3",
+  "code": "206",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 530,
+  "y": 300
+ },
+ {
+  "id": "room_E3_205",
+  "building_id": "bld_E3",
+  "code": "205",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 602,
+  "y": 300
+ },
+ {
+  "id": "room_E3_204",
+  "building_id": "bld_E3",
+  "code": "204",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 673,
+  "y": 300
+ },
+ {
+  "id": "room_E3_203",
+  "building_id": "bld_E3",
+  "code": "203",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 743,
+  "y": 300
+ },
+ {
+  "id": "room_E3_202",
+  "building_id": "bld_E3",
+  "code": "202",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E3_2_1",
+  "x": 815,
+  "y": 300
+ },
+ {
+  "id": "room_E3_316",
+  "building_id": "bld_E3",
+  "code": "316",
+  "name": "임베디드 실험실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 195,
+  "y": 55
+ },
+ {
+  "id": "room_E3_317",
+  "building_id": "bld_E3",
+  "code": "317",
+  "name": "수리체험실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 345,
+  "y": 55
+ },
+ {
+  "id": "room_E3_318",
+  "building_id": "bld_E3",
+  "code": "318",
+  "name": "수리해석실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 503,
+  "y": 55
+ },
+ {
+  "id": "room_E3_319",
+  "building_id": "bld_E3",
+  "code": "319",
+  "name": "수리전산 관리실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 626,
+  "y": 55
+ },
+ {
+  "id": "room_E3_320",
+  "building_id": "bld_E3",
+  "code": "320",
+  "name": "수리시뮬레이션실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 722,
+  "y": 55
+ },
+ {
+  "id": "room_E3_323",
+  "building_id": "bld_E3",
+  "code": "323",
+  "name": "세미나(소)",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 454,
+  "y": 165
+ },
+ {
+  "id": "room_E3_322",
+  "building_id": "bld_E3",
+  "code": "322",
+  "name": "세미나(소)",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 522,
+  "y": 165
+ },
+ {
+  "id": "room_E3_321",
+  "building_id": "bld_E3",
+  "code": "321",
+  "name": "세미나(소)",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 588,
+  "y": 165
+ },
+ {
+  "id": "room_E3_315",
+  "building_id": "bld_E3",
+  "code": "315",
+  "name": "회의실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 190,
+  "y": 203
+ },
+ {
+  "id": "room_E3_301",
+  "building_id": "bld_E3",
+  "code": "301",
+  "name": "교류라운지",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 870,
+  "y": 212
+ },
+ {
+  "id": "room_E3_314",
+  "building_id": "bld_E3",
+  "code": "314",
+  "name": "교수실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 28,
+  "y": 300
+ },
+ {
+  "id": "room_E3_313",
+  "building_id": "bld_E3",
+  "code": "313",
+  "name": "교수실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 73,
+  "y": 300
+ },
+ {
+  "id": "room_E3_312",
+  "building_id": "bld_E3",
+  "code": "312",
+  "name": "교수실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 120,
+  "y": 300
+ },
+ {
+  "id": "room_E3_311",
+  "building_id": "bld_E3",
+  "code": "311",
+  "name": "교수실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 167,
+  "y": 300
+ },
+ {
+  "id": "room_E3_310",
+  "building_id": "bld_E3",
+  "code": "310",
+  "name": "황규영 교수실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 218,
+  "y": 300
+ },
+ {
+  "id": "room_E3_309",
+  "building_id": "bld_E3",
+  "code": "309",
+  "name": "교수실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 265,
+  "y": 300
+ },
+ {
+  "id": "room_E3_308",
+  "building_id": "bld_E3",
+  "code": "308",
+  "name": "리빙룸",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 320,
+  "y": 300
+ },
+ {
+  "id": "room_E3_307",
+  "building_id": "bld_E3",
+  "code": "307",
+  "name": "대학원 연구실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 463,
+  "y": 300
+ },
+ {
+  "id": "room_E3_306",
+  "building_id": "bld_E3",
+  "code": "306",
+  "name": "대학원 연구실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 532,
+  "y": 300
+ },
+ {
+  "id": "room_E3_305",
+  "building_id": "bld_E3",
+  "code": "305",
+  "name": "대학원 연구실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 603,
+  "y": 300
+ },
+ {
+  "id": "room_E3_304",
+  "building_id": "bld_E3",
+  "code": "304",
+  "name": "대학원 연구실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 673,
+  "y": 300
+ },
+ {
+  "id": "room_E3_303",
+  "building_id": "bld_E3",
+  "code": "303",
+  "name": "대학원 연구실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 743,
+  "y": 300
+ },
+ {
+  "id": "room_E3_302",
+  "building_id": "bld_E3",
+  "code": "302",
+  "name": "대학원 연구실",
+  "floor": "3",
+  "plan_id": "plan_E3_3_1",
+  "x": 815,
+  "y": 300
+ },
+ {
+  "id": "room_E4_219",
+  "building_id": "bld_E4",
+  "code": "219",
+  "name": "임시실험실3",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 60,
+  "y": 22
+ },
+ {
+  "id": "room_E4_218",
+  "building_id": "bld_E4",
+  "code": "218",
+  "name": "임시실험실2",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 60,
+  "y": 57
+ },
+ {
+  "id": "room_E4_217",
+  "building_id": "bld_E4",
+  "code": "217",
+  "name": "임시실험실1",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 60,
+  "y": 95
+ },
+ {
+  "id": "room_E4_220",
+  "building_id": "bld_E4",
+  "code": "220",
+  "name": "생리학 실험실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 175,
+  "y": 65
+ },
+ {
+  "id": "room_E4_221",
+  "building_id": "bld_E4",
+  "code": "221",
+  "name": "생명실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 260,
+  "y": 65
+ },
+ {
+  "id": "room_E4_222",
+  "building_id": "bld_E4",
+  "code": "222",
+  "name": "세포생명학 실험실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 358,
+  "y": 65
+ },
+ {
+  "id": "room_E4_223",
+  "building_id": "bld_E4",
+  "code": "223",
+  "name": "세포생물학 실험실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 500,
+  "y": 65
+ },
+ {
+  "id": "room_E4_224",
+  "building_id": "bld_E4",
+  "code": "224",
+  "name": "실험준비실1",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 598,
+  "y": 65
+ },
+ {
+  "id": "room_E4_225",
+  "building_id": "bld_E4",
+  "code": "225",
+  "name": "분자생물학 실험실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 670,
+  "y": 65
+ },
+ {
+  "id": "room_E4_226",
+  "building_id": "bld_E4",
+  "code": "226",
+  "name": "미생물학 실험실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 755,
+  "y": 65
+ },
+ {
+  "id": "room_E4_227",
+  "building_id": "bld_E4",
+  "code": "227",
+  "name": "미디어랩",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 865,
+  "y": 65
+ },
+ {
+  "id": "room_E4_233",
+  "building_id": "bld_E4",
+  "code": "233",
+  "name": "실험준비실2",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 440,
+  "y": 180
+ },
+ {
+  "id": "room_E4_232",
+  "building_id": "bld_E4",
+  "code": "232",
+  "name": "실험실습 관리실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 478,
+  "y": 180
+ },
+ {
+  "id": "room_E4_231",
+  "building_id": "bld_E4",
+  "code": "231",
+  "name": "현미경실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 515,
+  "y": 180
+ },
+ {
+  "id": "room_E4_230",
+  "building_id": "bld_E4",
+  "code": "230",
+  "name": "세척실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 550,
+  "y": 180
+ },
+ {
+  "id": "room_E4_229",
+  "building_id": "bld_E4",
+  "code": "229",
+  "name": "분석 장비실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 615,
+  "y": 180
+ },
+ {
+  "id": "room_E4_228",
+  "building_id": "bld_E4",
+  "code": "228",
+  "name": "모델생물 준비실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 676,
+  "y": 180
+ },
+ {
+  "id": "room_E4_216",
+  "building_id": "bld_E4",
+  "code": "216",
+  "name": "회의실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 193,
+  "y": 220
+ },
+ {
+  "id": "room_E4_201",
+  "building_id": "bld_E4",
+  "code": "201",
+  "name": "교류라운지",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 930,
+  "y": 233
+ },
+ {
+  "id": "room_E4_215",
+  "building_id": "bld_E4",
+  "code": "215",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 170,
+  "y": 330
+ },
+ {
+  "id": "room_E4_214",
+  "building_id": "bld_E4",
+  "code": "214",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 218,
+  "y": 330
+ },
+ {
+  "id": "room_E4_213",
+  "building_id": "bld_E4",
+  "code": "213",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 264,
+  "y": 330
+ },
+ {
+  "id": "room_E4_212",
+  "building_id": "bld_E4",
+  "code": "212",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 312,
+  "y": 330
+ },
+ {
+  "id": "room_E4_211",
+  "building_id": "bld_E4",
+  "code": "211",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 358,
+  "y": 330
+ },
+ {
+  "id": "room_E4_210",
+  "building_id": "bld_E4",
+  "code": "210",
+  "name": "김주한 교수실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 408,
+  "y": 330
+ },
+ {
+  "id": "room_E4_209",
+  "building_id": "bld_E4",
+  "code": "209",
+  "name": "김대환 교수실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 455,
+  "y": 330
+ },
+ {
+  "id": "room_E4_208",
+  "building_id": "bld_E4",
+  "code": "208",
+  "name": "리빙룸",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 525,
+  "y": 335
+ },
+ {
+  "id": "room_E4_207",
+  "building_id": "bld_E4",
+  "code": "207",
+  "name": "세미나(소)",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 595,
+  "y": 330
+ },
+ {
+  "id": "room_E4_206",
+  "building_id": "bld_E4",
+  "code": "206",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 648,
+  "y": 330
+ },
+ {
+  "id": "room_E4_205",
+  "building_id": "bld_E4",
+  "code": "205",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 688,
+  "y": 330
+ },
+ {
+  "id": "room_E4_204",
+  "building_id": "bld_E4",
+  "code": "204",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 733,
+  "y": 330
+ },
+ {
+  "id": "room_E4_203",
+  "building_id": "bld_E4",
+  "code": "203",
+  "name": "세미나(소)",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 780,
+  "y": 330
+ },
+ {
+  "id": "room_E4_202",
+  "building_id": "bld_E4",
+  "code": "202",
+  "name": "세미나(중)",
+  "floor": "2",
+  "plan_id": "plan_E4_2_1",
+  "x": 870,
+  "y": 330
+ },
+ {
+  "id": "room_E5_216",
+  "building_id": "bld_E5",
+  "code": "216",
+  "name": "로봇데모실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 75,
+  "y": 72
+ },
+ {
+  "id": "room_E5_217",
+  "building_id": "bld_E5",
+  "code": "217",
+  "name": "로봇공학 실험실1",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 253,
+  "y": 62
+ },
+ {
+  "id": "room_E5_218",
+  "building_id": "bld_E5",
+  "code": "218",
+  "name": "공학시작실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 425,
+  "y": 62
+ },
+ {
+  "id": "room_E5_219",
+  "building_id": "bld_E5",
+  "code": "219",
+  "name": "실험준비실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 533,
+  "y": 62
+ },
+ {
+  "id": "room_E5_220A",
+  "building_id": "bld_E5",
+  "code": "220A",
+  "name": "자동제어 시스템 실습실1",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 620,
+  "y": 70
+ },
+ {
+  "id": "room_E5_220B",
+  "building_id": "bld_E5",
+  "code": "220B",
+  "name": "자동제어 시스템 실습실2",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 708,
+  "y": 70
+ },
+ {
+  "id": "room_E5_221",
+  "building_id": "bld_E5",
+  "code": "221",
+  "name": "프로그래밍 실습실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 815,
+  "y": 62
+ },
+ {
+  "id": "room_E5_223",
+  "building_id": "bld_E5",
+  "code": "223",
+  "name": "로봇프로그래밍 실험실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 476,
+  "y": 182
+ },
+ {
+  "id": "room_E5_222",
+  "building_id": "bld_E5",
+  "code": "222",
+  "name": "세미나(W)",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 580,
+  "y": 182
+ },
+ {
+  "id": "room_E5_215",
+  "building_id": "bld_E5",
+  "code": "215",
+  "name": "회의실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 195,
+  "y": 220
+ },
+ {
+  "id": "room_E5_201",
+  "building_id": "bld_E5",
+  "code": "201",
+  "name": "교류라운지",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 897,
+  "y": 230
+ },
+ {
+  "id": "room_E5_214",
+  "building_id": "bld_E5",
+  "code": "214",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 172,
+  "y": 325
+ },
+ {
+  "id": "room_E5_213",
+  "building_id": "bld_E5",
+  "code": "213",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 218,
+  "y": 325
+ },
+ {
+  "id": "room_E5_212",
+  "building_id": "bld_E5",
+  "code": "212",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 266,
+  "y": 325
+ },
+ {
+  "id": "room_E5_211",
+  "building_id": "bld_E5",
+  "code": "211",
+  "name": "김진 교수실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 312,
+  "y": 325
+ },
+ {
+  "id": "room_E5_210",
+  "building_id": "bld_E5",
+  "code": "210",
+  "name": "교수실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 360,
+  "y": 325
+ },
+ {
+  "id": "room_E5_209",
+  "building_id": "bld_E5",
+  "code": "209",
+  "name": "김학수·김진 교수실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 410,
+  "y": 325
+ },
+ {
+  "id": "room_E5_208",
+  "building_id": "bld_E5",
+  "code": "208",
+  "name": "윤지성 교수실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 466,
+  "y": 325
+ },
+ {
+  "id": "room_E5_207",
+  "building_id": "bld_E5",
+  "code": "207",
+  "name": "리빙룸",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 535,
+  "y": 335
+ },
+ {
+  "id": "room_E5_206",
+  "building_id": "bld_E5",
+  "code": "206",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 607,
+  "y": 325
+ },
+ {
+  "id": "room_E5_205",
+  "building_id": "bld_E5",
+  "code": "205",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 668,
+  "y": 325
+ },
+ {
+  "id": "room_E5_204",
+  "building_id": "bld_E5",
+  "code": "204",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 730,
+  "y": 325
+ },
+ {
+  "id": "room_E5_203",
+  "building_id": "bld_E5",
+  "code": "203",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 790,
+  "y": 325
+ },
+ {
+  "id": "room_E5_202",
+  "building_id": "bld_E5",
+  "code": "202",
+  "name": "대학원 연구실",
+  "floor": "2",
+  "plan_id": "plan_E5_2_1",
+  "x": 852,
+  "y": 325
+ },
+ {
+  "id": "room_E6_217A",
+  "building_id": "bld_E6",
+  "code": "217A",
+  "name": "세척실",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 38,
+  "y": 32
+ },
+ {
+  "id": "room_E6_217B",
+  "building_id": "bld_E6",
+  "code": "217B",
+  "name": "장비실",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 108,
+  "y": 32
+ },
+ {
+  "id": "room_E6_217",
+  "building_id": "bld_E6",
+  "code": "217",
+  "name": "생화학 실험실",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 75,
+  "y": 95
+ },
+ {
+  "id": "room_E6_218",
+  "building_id": "bld_E6",
+  "code": "218",
+  "name": "기초화학 실험실1",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 230,
+  "y": 62
+ },
+ {
+  "id": "room_E6_219",
+  "building_id": "bld_E6",
+  "code": "219",
+  "name": "실험준비실",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 335,
+  "y": 70
+ },
+ {
+  "id": "room_E6_220",
+  "building_id": "bld_E6",
+  "code": "220",
+  "name": "화학반응실",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 412,
+  "y": 70
+ },
+ {
+  "id": "room_E6_221",
+  "building_id": "bld_E6",
+  "code": "221",
+  "name": "기초화학 실험실2",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 527,
+  "y": 70
+ },
+ {
+  "id": "room_E6_222",
+  "building_id": "bld_E6",
+  "code": "222",
+  "name": "심화화학 실험실1",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 670,
+  "y": 70
+ },
+ {
+  "id": "room_E6_223",
+  "building_id": "bld_E6",
+  "code": "223",
+  "name": "심화화학 실험실2",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 810,
+  "y": 70
+ },
+ {
+  "id": "room_E6_224",
+  "building_id": "bld_E6",
+  "code": "224",
+  "name": "반응측정실",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 543,
+  "y": 185
+ },
+ {
+  "id": "room_E6_216",
+  "building_id": "bld_E6",
+  "code": "216",
+  "name": "회의실",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 193,
+  "y": 222
+ },
+ {
+  "id": "room_E6_201",
+  "building_id": "bld_E6",
+  "code": "201",
+  "name": "교류라운지",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 897,
+  "y": 242
+ },
+ {
+  "id": "room_E6_215",
+  "building_id": "bld_E6",
+  "code": "215",
+  "name": "조별 토론실",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 30,
+  "y": 318
+ },
+ {
+  "id": "room_E6_214",
+  "building_id": "bld_E6",
+  "code": "214",
+  "name": "자료실",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 78,
+  "y": 325
+ },
+ {
+  "id": "room_E6_213",
+  "building_id": "bld_E6",
+  "code": "213",
+  "name": "류한일 교수실",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 125,
+  "y": 318
+ },
+ {
+  "id": "room_E6_212",
+  "building_id": "bld_E6",
+  "code": "212",
+  "name": "임용예정 교원",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 178,
+  "y": 318
+ },
+ {
+  "id": "room_E6_211",
+  "building_id": "bld_E6",
+  "code": "211",
+  "name": "정현숙 교수실",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 232,
+  "y": 318
+ },
+ {
+  "id": "room_E6_210",
+  "building_id": "bld_E6",
+  "code": "210",
+  "name": "분석실3",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 275,
+  "y": 318
+ },
+ {
+  "id": "room_E6_208",
+  "building_id": "bld_E6",
+  "code": "208",
+  "name": "분석실2",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 320,
+  "y": 318
+ },
+ {
+  "id": "room_E6_208_2",
+  "building_id": "bld_E6",
+  "code": "208",
+  "name": "리빙룸",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 375,
+  "y": 325
+ },
+ {
+  "id": "room_E6_207",
+  "building_id": "bld_E6",
+  "code": "207",
+  "name": "시약실2",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 510,
+  "y": 318
+ },
+ {
+  "id": "room_E6_206",
+  "building_id": "bld_E6",
+  "code": "206",
+  "name": "시약실1",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 568,
+  "y": 318
+ },
+ {
+  "id": "room_E6_205",
+  "building_id": "bld_E6",
+  "code": "205",
+  "name": "분석실1",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 640,
+  "y": 318
+ },
+ {
+  "id": "room_E6_204",
+  "building_id": "bld_E6",
+  "code": "204",
+  "name": "장비 보관실2",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 710,
+  "y": 318
+ },
+ {
+  "id": "room_E6_203",
+  "building_id": "bld_E6",
+  "code": "203",
+  "name": "초자 보관실",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 778,
+  "y": 318
+ },
+ {
+  "id": "room_E6_202",
+  "building_id": "bld_E6",
+  "code": "202",
+  "name": "학생 라커룸",
+  "floor": "2",
+  "plan_id": "plan_E6_2_1",
+  "x": 850,
+  "y": 318
+ },
+ {
+  "id": "room_E7_G01",
+  "building_id": "bld_E7",
+  "code": "G01",
+  "name": "멀티미디어 강의실1",
+  "floor": "G",
+  "plan_id": "plan_E7_G_1",
+  "x": 218,
+  "y": 360
+ },
+ {
+  "id": "room_E7_G02",
+  "building_id": "bld_E7",
+  "code": "G02",
+  "name": "멀티미디어 강의실2",
+  "floor": "G",
+  "plan_id": "plan_E7_G_1",
+  "x": 320,
+  "y": 360
+ },
+ {
+  "id": "room_E7_G03",
+  "building_id": "bld_E7",
+  "code": "G03",
+  "name": "PBL 강의실",
+  "floor": "G",
+  "plan_id": "plan_E7_G_1",
+  "x": 420,
+  "y": 360
+ },
+ {
+  "id": "room_E7_G11",
+  "building_id": "bld_E7",
+  "code": "G11",
+  "name": "강효상 교수실",
+  "floor": "G",
+  "plan_id": "plan_E7_G_1",
+  "x": 192,
+  "y": 485
+ },
+ {
+  "id": "room_E7_G10",
+  "building_id": "bld_E7",
+  "code": "G10",
+  "name": "조희승 교수실",
+  "floor": "G",
+  "plan_id": "plan_E7_G_1",
+  "x": 243,
+  "y": 485
+ },
+ {
+  "id": "room_E7_G09",
+  "building_id": "bld_E7",
+  "code": "G09",
+  "name": "김성균 교수실",
+  "floor": "G",
+  "plan_id": "plan_E7_G_1",
+  "x": 293,
+  "y": 485
+ },
+ {
+  "id": "room_E7_G08",
+  "building_id": "bld_E7",
+  "code": "G08",
+  "name": "조정아 교수실",
+  "floor": "G",
+  "plan_id": "plan_E7_G_1",
+  "x": 343,
+  "y": 485
+ },
+ {
+  "id": "room_E7_G07",
+  "building_id": "bld_E7",
+  "code": "G07",
+  "name": "임태훈 교수실",
+  "floor": "G",
+  "plan_id": "plan_E7_G_1",
+  "x": 390,
+  "y": 485
+ },
+ {
+  "id": "room_E7_G06",
+  "building_id": "bld_E7",
+  "code": "G06",
+  "name": "Aaron Cumberledge 교수실",
+  "floor": "G",
+  "plan_id": "plan_E7_G_1",
+  "x": 437,
+  "y": 485
+ },
+ {
+  "id": "room_E7_G05",
+  "building_id": "bld_E7",
+  "code": "G05",
+  "name": "이화정 교수실",
+  "floor": "G",
+  "plan_id": "plan_E7_G_1",
+  "x": 487,
+  "y": 485
+ },
+ {
+  "id": "room_E7_G04",
+  "building_id": "bld_E7",
+  "code": "G04",
+  "name": "이지훈 교수실",
+  "floor": "G",
+  "plan_id": "plan_E7_G_1",
+  "x": 535,
+  "y": 485
+ },
+ {
+  "id": "room_E7_L29",
+  "building_id": "bld_E7",
+  "code": "L29",
+  "name": "대강당",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 322,
+  "y": 85
+ },
+ {
+  "id": "room_E7_L30",
+  "building_id": "bld_E7",
+  "code": "L30",
+  "name": "PBL 강의실",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 816,
+  "y": 105
+ },
+ {
+  "id": "room_E7_L20",
+  "building_id": "bld_E7",
+  "code": "L20",
+  "name": "일반 강의실(소)-1",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 35,
+  "y": 285
+ },
+ {
+  "id": "room_E7_L21",
+  "building_id": "bld_E7",
+  "code": "L21",
+  "name": "멀티미디어 강의실3",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 155,
+  "y": 285
+ },
+ {
+  "id": "room_E7_L22",
+  "building_id": "bld_E7",
+  "code": "L22",
+  "name": "멀티미디어 강의실4",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 275,
+  "y": 285
+ },
+ {
+  "id": "room_E7_L28",
+  "building_id": "bld_E7",
+  "code": "L28",
+  "name": "어학 강의실5",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 450,
+  "y": 262
+ },
+ {
+  "id": "room_E7_L27",
+  "building_id": "bld_E7",
+  "code": "L27",
+  "name": "어학 강의실4",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 528,
+  "y": 262
+ },
+ {
+  "id": "room_E7_L26",
+  "building_id": "bld_E7",
+  "code": "L26",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 602,
+  "y": 265
+ },
+ {
+  "id": "room_E7_L23",
+  "building_id": "bld_E7",
+  "code": "L23",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 450,
+  "y": 318
+ },
+ {
+  "id": "room_E7_L24",
+  "building_id": "bld_E7",
+  "code": "L24",
+  "name": "자료 및 기자재 보관실",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 528,
+  "y": 318
+ },
+ {
+  "id": "room_E7_L25",
+  "building_id": "bld_E7",
+  "code": "L25",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 602,
+  "y": 320
+ },
+ {
+  "id": "room_E7_L01",
+  "building_id": "bld_E7",
+  "code": "L01",
+  "name": "학생 휴게실",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 782,
+  "y": 270
+ },
+ {
+  "id": "room_E7_L02",
+  "building_id": "bld_E7",
+  "code": "L02",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 718,
+  "y": 305
+ },
+ {
+  "id": "room_E7_L03",
+  "building_id": "bld_E7",
+  "code": "L03",
+  "name": "강사 대기실",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 684,
+  "y": 345
+ },
+ {
+  "id": "room_E7_L19",
+  "building_id": "bld_E7",
+  "code": "L19",
+  "name": "회의실",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 35,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L18",
+  "building_id": "bld_E7",
+  "code": "L18",
+  "name": "회의실",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 102,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L17",
+  "building_id": "bld_E7",
+  "code": "L17",
+  "name": "정병혁 교수실",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 158,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L16",
+  "building_id": "bld_E7",
+  "code": "L16",
+  "name": "Philip Johnson 교수실",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 205,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L15",
+  "building_id": "bld_E7",
+  "code": "L15",
+  "name": "한강진 교수실",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 250,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L14",
+  "building_id": "bld_E7",
+  "code": "L14",
+  "name": "Rose 교수실",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 290,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L13",
+  "building_id": "bld_E7",
+  "code": "L13",
+  "name": "신동훈 교수실",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 334,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L12",
+  "building_id": "bld_E7",
+  "code": "L12",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 372,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L11",
+  "building_id": "bld_E7",
+  "code": "L11",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 406,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L10",
+  "building_id": "bld_E7",
+  "code": "L10",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 439,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L09",
+  "building_id": "bld_E7",
+  "code": "L09",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 476,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L08",
+  "building_id": "bld_E7",
+  "code": "L08",
+  "name": "임진우 교수실",
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 510,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L07",
+  "building_id": "bld_E7",
+  "code": "L07",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 546,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L06",
+  "building_id": "bld_E7",
+  "code": "L06",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 578,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L05",
+  "building_id": "bld_E7",
+  "code": "L05",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 615,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L04",
+  "building_id": "bld_E7",
+  "code": "L04",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_1",
+  "x": 660,
+  "y": 395
+ },
+ {
+  "id": "room_E7_L31",
+  "building_id": "bld_E7",
+  "code": "L31",
+  "name": "일반 강의실(소)-2",
+  "floor": "L",
+  "plan_id": "plan_E7_L_2",
+  "x": 370,
+  "y": 155
+ },
+ {
+  "id": "room_E7_L44",
+  "building_id": "bld_E7",
+  "code": "L44",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_2",
+  "x": 455,
+  "y": 312
+ },
+ {
+  "id": "room_E7_L34",
+  "building_id": "bld_E7",
+  "code": "L34",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_2",
+  "x": 635,
+  "y": 370
+ },
+ {
+  "id": "room_E7_L35",
+  "building_id": "bld_E7",
+  "code": "L35",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_2",
+  "x": 707,
+  "y": 310
+ },
+ {
+  "id": "room_E7_L36",
+  "building_id": "bld_E7",
+  "code": "L36",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_2",
+  "x": 707,
+  "y": 372
+ },
+ {
+  "id": "room_E7_L38",
+  "building_id": "bld_E7",
+  "code": "L38",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_2",
+  "x": 690,
+  "y": 432
+ },
+ {
+  "id": "room_E7_L37",
+  "building_id": "bld_E7",
+  "code": "L37",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_2",
+  "x": 727,
+  "y": 432
+ },
+ {
+  "id": "room_E7_L43",
+  "building_id": "bld_E7",
+  "code": "L43",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_2",
+  "x": 535,
+  "y": 445
+ },
+ {
+  "id": "room_E7_L42",
+  "building_id": "bld_E7",
+  "code": "L42",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_2",
+  "x": 572,
+  "y": 490
+ },
+ {
+  "id": "room_E7_L41",
+  "building_id": "bld_E7",
+  "code": "L41",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_2",
+  "x": 633,
+  "y": 500
+ },
+ {
+  "id": "room_E7_L40",
+  "building_id": "bld_E7",
+  "code": "L40",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_2",
+  "x": 690,
+  "y": 500
+ },
+ {
+  "id": "room_E7_L39",
+  "building_id": "bld_E7",
+  "code": "L39",
+  "name": null,
+  "floor": "L",
+  "plan_id": "plan_E7_L_2",
+  "x": 727,
+  "y": 500
+ },
+ {
+  "id": "room_E7_222",
+  "building_id": "bld_E7",
+  "code": "222",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 35,
+  "y": 277
+ },
+ {
+  "id": "room_E7_221",
+  "building_id": "bld_E7",
+  "code": "221",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 35,
+  "y": 330
+ },
+ {
+  "id": "room_E7_223",
+  "building_id": "bld_E7",
+  "code": "223",
+  "name": "멀티미디어 강의실5",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 160,
+  "y": 295
+ },
+ {
+  "id": "room_E7_224",
+  "building_id": "bld_E7",
+  "code": "224",
+  "name": "멀티미디어 강의실6",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 275,
+  "y": 295
+ },
+ {
+  "id": "room_E7_230",
+  "building_id": "bld_E7",
+  "code": "230",
+  "name": "기초학부 교수 회의실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 450,
+  "y": 270
+ },
+ {
+  "id": "room_E7_229",
+  "building_id": "bld_E7",
+  "code": "229",
+  "name": "일반 강의실(소)-3",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 528,
+  "y": 270
+ },
+ {
+  "id": "room_E7_228",
+  "building_id": "bld_E7",
+  "code": "228",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 603,
+  "y": 277
+ },
+ {
+  "id": "room_E7_225",
+  "building_id": "bld_E7",
+  "code": "225",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 448,
+  "y": 330
+ },
+ {
+  "id": "room_E7_226",
+  "building_id": "bld_E7",
+  "code": "226",
+  "name": "스튜디오",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 528,
+  "y": 330
+ },
+ {
+  "id": "room_E7_227",
+  "building_id": "bld_E7",
+  "code": "227",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 603,
+  "y": 330
+ },
+ {
+  "id": "room_E7_232",
+  "building_id": "bld_E7",
+  "code": "232",
+  "name": "독서실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 802,
+  "y": 77
+ },
+ {
+  "id": "room_E7_231",
+  "building_id": "bld_E7",
+  "code": "231",
+  "name": "학생 휴게실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 802,
+  "y": 135
+ },
+ {
+  "id": "room_E7_201",
+  "building_id": "bld_E7",
+  "code": "201",
+  "name": "초빙강의 교수실(송재경)",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 795,
+  "y": 290
+ },
+ {
+  "id": "room_E7_202",
+  "building_id": "bld_E7",
+  "code": "202",
+  "name": "윤춘섭 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 718,
+  "y": 323
+ },
+ {
+  "id": "room_E7_203",
+  "building_id": "bld_E7",
+  "code": "203",
+  "name": "이석규 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 700,
+  "y": 350
+ },
+ {
+  "id": "room_E7_204",
+  "building_id": "bld_E7",
+  "code": "204",
+  "name": "이창훈 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 683,
+  "y": 377
+ },
+ {
+  "id": "room_E7_205",
+  "building_id": "bld_E7",
+  "code": "205",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 657,
+  "y": 413
+ },
+ {
+  "id": "room_E7_206",
+  "building_id": "bld_E7",
+  "code": "206",
+  "name": "최승호 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 615,
+  "y": 413
+ },
+ {
+  "id": "room_E7_207",
+  "building_id": "bld_E7",
+  "code": "207",
+  "name": "Philip 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 577,
+  "y": 413
+ },
+ {
+  "id": "room_E7_208",
+  "building_id": "bld_E7",
+  "code": "208",
+  "name": "박종래 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 538,
+  "y": 413
+ },
+ {
+  "id": "room_E7_209",
+  "building_id": "bld_E7",
+  "code": "209",
+  "name": "남창훈 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 497,
+  "y": 413
+ },
+ {
+  "id": "room_E7_210",
+  "building_id": "bld_E7",
+  "code": "210",
+  "name": "이두석 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 458,
+  "y": 413
+ },
+ {
+  "id": "room_E7_211",
+  "building_id": "bld_E7",
+  "code": "211",
+  "name": "김대륜 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 420,
+  "y": 413
+ },
+ {
+  "id": "room_E7_212",
+  "building_id": "bld_E7",
+  "code": "212",
+  "name": "이상임 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 382,
+  "y": 413
+ },
+ {
+  "id": "room_E7_213",
+  "building_id": "bld_E7",
+  "code": "213",
+  "name": "김남두 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 342,
+  "y": 413
+ },
+ {
+  "id": "room_E7_214",
+  "building_id": "bld_E7",
+  "code": "214",
+  "name": "박기성 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 302,
+  "y": 413
+ },
+ {
+  "id": "room_E7_215",
+  "building_id": "bld_E7",
+  "code": "215",
+  "name": "임용섭 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 263,
+  "y": 413
+ },
+ {
+  "id": "room_E7_216",
+  "building_id": "bld_E7",
+  "code": "216",
+  "name": "이정아 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 227,
+  "y": 413
+ },
+ {
+  "id": "room_E7_217",
+  "building_id": "bld_E7",
+  "code": "217",
+  "name": "이기준 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 191,
+  "y": 413
+ },
+ {
+  "id": "room_E7_218",
+  "building_id": "bld_E7",
+  "code": "218",
+  "name": "안흥주 교수실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 148,
+  "y": 413
+ },
+ {
+  "id": "room_E7_219",
+  "building_id": "bld_E7",
+  "code": "219",
+  "name": "기초학부 사무실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 98,
+  "y": 413
+ },
+ {
+  "id": "room_E7_220",
+  "building_id": "bld_E7",
+  "code": "220",
+  "name": "학부장실",
+  "floor": "2",
+  "plan_id": "plan_E7_2_1",
+  "x": 35,
+  "y": 413
+ },
+ {
+  "id": "room_E7_233",
+  "building_id": "bld_E7",
+  "code": "233",
+  "name": "일반 강의실(대)-1",
+  "floor": "2",
+  "plan_id": "plan_E7_2_2",
+  "x": 198,
+  "y": 215
+ },
+ {
+  "id": "room_E7_234",
+  "building_id": "bld_E7",
+  "code": "234",
+  "name": "그룹 스터디룸1",
+  "floor": "2",
+  "plan_id": "plan_E7_2_2",
+  "x": 418,
+  "y": 255
+ },
+ {
+  "id": "room_E7_235",
+  "building_id": "bld_E7",
+  "code": "235",
+  "name": "일반 강의실(소)-4",
+  "floor": "2",
+  "plan_id": "plan_E7_2_2",
+  "x": 605,
+  "y": 240
+ },
+ {
+  "id": "room_E7_236",
+  "building_id": "bld_E7",
+  "code": "236",
+  "name": "일반 강의실(대)-2",
+  "floor": "2",
+  "plan_id": "plan_E7_2_2",
+  "x": 732,
+  "y": 215
+ },
+ {
+  "id": "room_E7_237",
+  "building_id": "bld_E7",
+  "code": "237",
+  "name": "일반 강의실(소)-5",
+  "floor": "2",
+  "plan_id": "plan_E7_2_2",
+  "x": 870,
+  "y": 235
+ },
+ {
+  "id": "room_E7_270",
+  "building_id": "bld_E7",
+  "code": "270",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_2",
+  "x": 523,
+  "y": 397
+ },
+ {
+  "id": "room_E7_269",
+  "building_id": "bld_E7",
+  "code": "269",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_2",
+  "x": 600,
+  "y": 397
+ },
+ {
+  "id": "room_E7_268",
+  "building_id": "bld_E7",
+  "code": "268",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_2",
+  "x": 673,
+  "y": 397
+ },
+ {
+  "id": "room_E7_267",
+  "building_id": "bld_E7",
+  "code": "267",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_2",
+  "x": 740,
+  "y": 397
+ },
+ {
+  "id": "room_E7_240",
+  "building_id": "bld_E7",
+  "code": "240",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_3",
+  "x": 167,
+  "y": 110
+ },
+ {
+  "id": "room_E7_241",
+  "building_id": "bld_E7",
+  "code": "241",
+  "name": "일반 강의실(중)-1",
+  "floor": "2",
+  "plan_id": "plan_E7_2_3",
+  "x": 350,
+  "y": 100
+ },
+ {
+  "id": "room_E7_242",
+  "building_id": "bld_E7",
+  "code": "242",
+  "name": "일반 강의실(중)-2",
+  "floor": "2",
+  "plan_id": "plan_E7_2_3",
+  "x": 490,
+  "y": 100
+ },
+ {
+  "id": "room_E7_266",
+  "building_id": "bld_E7",
+  "code": "266",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_3",
+  "x": 170,
+  "y": 222
+ },
+ {
+  "id": "room_E7_264",
+  "building_id": "bld_E7",
+  "code": "264",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_3",
+  "x": 212,
+  "y": 253
+ },
+ {
+  "id": "room_E7_265",
+  "building_id": "bld_E7",
+  "code": "265",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_3",
+  "x": 183,
+  "y": 277
+ },
+ {
+  "id": "room_E7_262",
+  "building_id": "bld_E7",
+  "code": "262",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_3",
+  "x": 253,
+  "y": 300
+ },
+ {
+  "id": "room_E7_263",
+  "building_id": "bld_E7",
+  "code": "263",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_3",
+  "x": 223,
+  "y": 325
+ },
+ {
+  "id": "room_E7_261",
+  "building_id": "bld_E7",
+  "code": "261",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_3",
+  "x": 300,
+  "y": 353
+ },
+ {
+  "id": "room_E7_243",
+  "building_id": "bld_E7",
+  "code": "243",
+  "name": null,
+  "floor": "2",
+  "plan_id": "plan_E7_2_3",
+  "x": 520,
+  "y": 300
+ }
+]

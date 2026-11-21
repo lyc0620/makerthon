@@ -1,0 +1,122 @@
+[
+ {
+  "id": "plan_E2_2_1",
+  "building_id": "bld_E2",
+  "floor": "2",
+  "floor_label": "2층",
+  "image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img01.png",
+  "width": 893,
+  "height": 365,
+  "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+ },
+ {
+  "id": "plan_E3_2_1",
+  "building_id": "bld_E3",
+  "floor": "2",
+  "floor_label": "2층",
+  "image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img02.png",
+  "width": 906,
+  "height": 336,
+  "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+ },
+ {
+  "id": "plan_E3_3_1",
+  "building_id": "bld_E3",
+  "floor": "3",
+  "floor_label": "3층",
+  "image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img03.png",
+  "width": 906,
+  "height": 336,
+  "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+ },
+ {
+  "id": "plan_E4_2_1",
+  "building_id": "bld_E4",
+  "floor": "2",
+  "floor_label": "2층",
+  "image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img04.png",
+  "width": 963,
+  "height": 359,
+  "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+ },
+ {
+  "id": "plan_E5_2_1",
+  "building_id": "bld_E5",
+  "floor": "2",
+  "floor_label": "2층",
+  "image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img05.png",
+  "width": 936,
+  "height": 359,
+  "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+ },
+ {
+  "id": "plan_E6_2_1",
+  "building_id": "bld_E6",
+  "floor": "2",
+  "floor_label": "2층",
+  "image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img06.png",
+  "width": 936,
+  "height": 361,
+  "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+ },
+ {
+  "id": "plan_E7_G_1",
+  "building_id": "bld_E7",
+  "floor": "G",
+  "floor_label": "G층",
+  "image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img07.png",
+  "width": 845,
+  "height": 541,
+  "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+ },
+ {
+  "id": "plan_E7_L_1",
+  "building_id": "bld_E7",
+  "floor": "L",
+  "floor_label": "L층",
+  "image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img08.png",
+  "width": 920,
+  "height": 431,
+  "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+ },
+ {
+  "id": "plan_E7_L_2",
+  "building_id": "bld_E7",
+  "floor": "L",
+  "floor_label": "L층",
+  "image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img08_2.png",
+  "width": 885,
+  "height": 526,
+  "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+ },
+ {
+  "id": "plan_E7_2_1",
+  "building_id": "bld_E7",
+  "floor": "2",
+  "floor_label": "2층",
+  "image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img09.png",
+  "width": 836,
+  "height": 451,
+  "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+ },
+ {
+  "id": "plan_E7_2_2",
+  "building_id": "bld_E7",
+  "floor": "2",
+  "floor_label": "2층",
+  "image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img09_2.png",
+  "width": 926,
+  "height": 430,
+  "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+ },
+ {
+  "id": "plan_E7_2_3",
+  "building_id": "bld_E7",
+  "floor": "2",
+  "floor_label": "2층",
+  "image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img09_3.png",
+  "width": 757,
+  "height": 411,
+  "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+ }
+]

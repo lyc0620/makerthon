@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>3D 실내 스플랫</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; color: #eee; font-family: system-ui, sans-serif; overflow: hidden; }
+  #info {
+    position: absolute; top: 12px; left: 12px; right: 12px; max-width: 420px; z-index: 10;
+    background: rgba(0,0,0,.6); padding: 10px 12px; border-radius: 10px; font-size: 13px; line-height: 1.5;
+  }
+  #info b { font-size: 15px; }
+  #info a { color: #9cf; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "@mkkellogg/gaussian-splats-3d": "https://unpkg.com/@mkkellogg/gaussian-splats-3d@0.4.7/build/gaussian-splats-3d.module.js"
+} }
+</script>
+</head>
+<body>
+<div id="info">
+  <b id="title">3D 스플랫</b><br />
+  <span id="status">불러오는 중...</span><br />
+  드래그: 회전 · 휠: 확대 · 오른쪽 드래그: 이동 · <a href="/">← 지도로</a>
+</div>
+<script type="module">
+import * as GS from "@mkkellogg/gaussian-splats-3d";
+
+// ?scan=e8_3f_gs → /scans/e8_3f_gs.ply (+ .json: up, center)
+const scan = new URLSearchParams(location.search).get("scan") || "e8_3f_gs";
+const base = location.protocol.startsWith("http") ? "" : "http://localhost:8000";
+const status = (t) => { document.getElementById("status").textContent = t; };
+
+let meta = { up: [0, -1, 0], center: [0, 0, 0] };
+try {
+  const r = await fetch(`${base}/scans/${scan}.json`);
+  if (r.ok) meta = { ...meta, ...(await r.json()) };
+} catch {}
+if (meta.title) document.getElementById("title").textContent = meta.title;
+
+const [cx, cy, cz] = meta.center, [ux, uy, uz] = meta.up;
+// 학습 때 저장한 실제 촬영 위치에서 시작 (없으면 중심 근처)
+const startPos = meta.start_position || [cx + ux * 1.5 + 2, cy + uy * 1.5, cz + uz * 1.5 + 2];
+const startLook = meta.start_look_at || [cx, cy, cz];
+const viewer = new GS.Viewer({
+  cameraUp: [ux, uy, uz],
+  initialCameraLookAt: startLook,
+  initialCameraPosition: startPos,
+  sharedMemoryForWorkers: false, // COOP/COEP 헤더 없이도 동작
+  dynamicScene: false,
+});
+// meta.format === "splat" 이면 경량 .splat (ply_to_splat.py 변환본), 아니면 원본 .ply
+const isSplat = meta.format === "splat";
+viewer.addSplatScene(`${base}/scans/${scan}.${isSplat ? "splat" : "ply"}`, {
+  format: isSplat ? GS.SceneFormat.Splat : GS.SceneFormat.Ply,
+  showLoadingUI: true,
+  progressiveLoad: true,
+  splatAlphaRemovalThreshold: 5,
+}).then(() => {
+  viewer.start();
+  status(`가우시안 ${meta.splats ? meta.splats.toLocaleString() + "개" : ""} · 영상에서 학습 (3D Gaussian Splatting)`);
+}).catch((e) => status("⚠ 불러오지 못했습니다: " + e.message));
+</script>
+</body>
+</html>

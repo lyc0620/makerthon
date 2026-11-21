@@ -196,6 +196,7 @@ hyeonpung-map/
 }
 ```
 > `aliases`는 세미나 장소 텍스트 매칭에 쓴다. 건물 목록은 `seed/buildings.json`에서 관리 (지도 담당과 함께 작성). 위 값은 형식 예시.
+> **(김도현) `seed/buildings.json` 작성 완료**: DGIST 사이버 투어 기준 21곳(E1~E8, R1~R7, 국제관, 비슬빌리지, 체육관 등). 위 필드에 `code`(예: `"E7"`)가 추가됨. `scripts/build_campus_seed.py`로 재생성.
 
 ### 6.2 버스 (나)
 
@@ -383,6 +384,46 @@ hyeonpung-map/
 - `POST /api/v1/auth/email/request` 요청: `{ "email": "xxx@학교도메인" }` → 학교 도메인만 허용, 6자리 코드 메일 발송
 - `POST /api/v1/auth/email/verify` 요청: `{ "email": "...", "code": "123456" }` → `{ "access_token": "...", "token_type": "bearer", "expires_in": 2592000 }`
 - 이메일 원문은 저장하지 않고 해시만 저장, 화면에는 닉네임만 노출
+
+### 6.8 강의실 검색 (김도현 담당 — 확정)
+
+데이터: `seed/buildings.json`(21곳), `seed/floor_plans.json`(층별 안내도 12장), `seed/rooms.json`(실 254개). DB 테이블은 쓰지 않고 메모리 검색.
+안내도는 [DGIST 학부 School Facilities](https://www.dgist.ac.kr/en_college/sub05_02.do) 공식 이미지 (E2~E6의 2층, E3 3층, E7 G·L·2층). 실 위치(x, y)는 이미지 픽셀 기준 수작업 근사값.
+
+**`GET /api/v1/campus/search?q=E7 L21&limit=20`** → 목록 응답, `items: CampusSearchItem[]`
+- 검색어 예: `"E7 L21"`, `"e7-233"`, `"L21"`(L·G 번호는 E7), `"216"`(여러 건물), `"멀티미디어"`(실 이름), `"도서관"`(건물 별칭)
+- 안내도에 없는 실(`"R2 301"`)은 `type: "building"` + 번호 첫 자리로 추정한 층
+```json
+{
+  "type": "room",
+  "id": "room_E7_L21",
+  "code": "L21",
+  "name": "멀티미디어 강의실3",
+  "floor": "L",
+  "floor_label": "L층",
+  "building": { "id": "bld_E7", "name": "E7 컨실리언스홀", "lat": 35.70595, "lng": 128.454018 },
+  "plan": {
+    "id": "plan_E7_L_1",
+    "image_url": "/api/v1/campus/floor-plans/plan_E7_L_1/image",
+    "source_image_url": "https://www.dgist.ac.kr/images/college/sub04/sub0402_img08.png",
+    "width": 920, "height": 431,
+    "source_url": "https://www.dgist.ac.kr/en_college/sub05_02.do"
+  },
+  "x": 155,
+  "y": 285
+}
+```
+- `type`: `"room"` | `"building"`. `building` 타입이면 `plan`, `x`, `y`, `name`은 `null`
+- `scans`: 그 건물·층의 3D 실내 스캔 목록 (없으면 `[]`). 현재 E8 3층 1개
+  ```json
+  "scans": [{ "id": "e8_3f_gs", "title": "3층 아트리움 → 유리벽 복도", "viewer": "splat", "viewer_url": "/splat-viewer?scan=e8_3f_gs" }]
+  ```
+  - `viewer`: `"splat"`(3D 가우시안 스플래팅) | `"points"`(점 구름). 목록은 `seed/scans.json`, 파일은 `backend/static/scans/`
+  - 뷰어 페이지(`/splat-viewer`, `/scan-viewer`)와 `/scans/{파일}`은 지금 dev 서버(`scripts/dev_route_server.py`)에만 있음 → 통합 시 Caddy 정적 서빙 또는 라우터로 옮겨야 함
+
+**`GET /api/v1/campus/floor-plans/{plan_id}/image`** → PNG
+- 학교 서버가 `Cross-Origin-Resource-Policy: same-site`라 브라우저에서 직접 띄울 수 없어 백엔드가 중계 (메모리 캐시). seed에 등록된 안내도만 허용
+- 실패 시 502 `UPSTREAM_ERROR`, 없는 id는 404
 
 ---
 
