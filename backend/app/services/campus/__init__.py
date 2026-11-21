@@ -147,7 +147,16 @@ def search(q: str, limit: int = 20) -> list[dict]:
         if any(nq in _norm(a) or (len(_norm(a)) >= 2 and _norm(a) == nq) for a in [b["name"], *b["aliases"]]):
             out.append(_building_item(b))
 
-    # 3) 실 이름
+    # 3) 3D 스캔 공간 이름 ("해동창의마루" → E7 L층)
+    for s in c.scans:
+        title = re.sub(r"^\S+층\s*", "", s["title"])  # "L층 해동창의마루" → "해동창의마루"
+        if len(nq) >= 2 and nq in _norm(title):
+            item = _building_item(c.buildings[s["building_id"]], s["floor"])
+            item["name"] = title
+            if all(o["id"] != item["id"] or o["floor"] != item["floor"] for o in out):
+                out.append(item)
+
+    # 4) 실 이름
     for r in c.rooms:
         if r["name"] and nq in _norm(r["name"]):
             out.append(_room_item(c, r))

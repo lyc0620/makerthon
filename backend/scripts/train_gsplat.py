@@ -132,6 +132,7 @@ def main():
     ap.add_argument("--steps", type=int, default=15000)
     ap.add_argument("--max-size", type=int, default=960)
     ap.add_argument("--sh-degree", type=int, default=3)
+    ap.add_argument("--max-splats", type=int, default=0, help="가우시안 수 상한 (0=무제한). 넘으면 증식 중단 (GPU 메모리 보호)")
     a = ap.parse_args()
     dev = "cuda"
     torch.manual_seed(0)
@@ -201,7 +202,10 @@ def main():
             o.step()
             o.zero_grad(set_to_none=True)
         means_sched.step()
-        strategy.step_post_backward(params, opts, state, step, info, packed=False)
+        if a.max_splats and len(params["means"]) >= a.max_splats:
+            pass  # 상한 도달: 증식·가지치기 중단, 기존 가우시안만 계속 최적화
+        else:
+            strategy.step_post_backward(params, opts, state, step, info, packed=False)
         if step % 500 == 0 or step == a.steps - 1:
             el = time.time() - t0
             eta = el / (step + 1) * (a.steps - step - 1)

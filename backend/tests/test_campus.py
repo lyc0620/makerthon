@@ -49,7 +49,16 @@ def test_scan_attached_to_e8_third_floor():
     assert it["scans"][0]["viewer_url"] == "/api/v1/scans/splat-viewer?scan=e8_3f_gs"
     assert search("도서관")[0]["scans"]  # 층 모르는 건물 검색도 스캔 연결
     assert search("E8 201")[0]["scans"] == []  # 다른 층은 없음
-    assert search("L21")[0]["scans"] == []
+    assert search("G01")[0]["scans"] == []  # E7 G층엔 스캔 없음
+
+
+def test_scan_space_name_search():
+    it = search("해동창의마루")[0]
+    assert it["building"]["id"] == "bld_E7" and it["floor_label"] == "L층" and it["name"] == "해동창의마루"
+    assert [s["id"] for s in it["scans"]] == ["e7_haedong_gs"]
+    assert search("해동")[0]["building"]["id"] == "bld_E7"
+    # E7 L층 강의실 검색에도 같은 층 스캔이 붙음
+    assert [s["id"] for s in search("L21")[0]["scans"]] == ["e7_haedong_gs"]
 
 
 def test_name_search():

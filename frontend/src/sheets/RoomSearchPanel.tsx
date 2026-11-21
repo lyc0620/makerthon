@@ -71,7 +71,7 @@ function FloorPlanCard({ item, onRoute }: { item: CampusSearchItem; onRoute: () 
               title={s.title}
               className="rounded border bg-gray-50 px-2 py-1"
             >
-              3D {s.title.replace(/^3층\s*/, "")}
+              3D {s.title.replace(/^\S+층\s*/, "")}
             </a>
           ))}
           <button onClick={onRoute} className="rounded border bg-gray-50 px-2 py-1">

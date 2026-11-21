@@ -44,4 +44,6 @@ def scan_file(name: str):
     if not _NAME.fullmatch(name) or not (SCANS / name).is_file():
         return _not_found("스캔 파일이 없습니다.")
     ext = name.rsplit(".", 1)[1]
-    return FileResponse(SCANS / name, media_type=_MEDIA[ext], headers={"Cache-Control": "public, max-age=86400"})
+    # 메타데이터(.json)는 시작 시점 등을 자주 고치므로 캐시하지 않고, 큰 스캔 파일만 하루 캐시
+    cache = "no-cache" if ext == "json" else "public, max-age=86400"
+    return FileResponse(SCANS / name, media_type=_MEDIA[ext], headers={"Cache-Control": cache})
