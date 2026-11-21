@@ -116,21 +116,22 @@ def _public(view: dict) -> dict:
 
 
 def _cast_vote(session: Session, report: Report, user: User, vote: str) -> None:
-    """표를 넣거나 바꿔요. 새로 '확인'이 되면 시간을 연장해요 (커밋은 부르는 쪽에서)."""
+    """표를 넣거나 바꿔요. '확인'이면 시간을 연장하는데, 한 사람당 제보 하나에 한 번만이에요.
+    (확인 → 없어요 → 확인을 반복해도 처음 한 번만 늘어나요. 커밋은 부르는 쪽에서)"""
     now = timeutil.now_utc()
     existing = session.get(ReportVote, (report.id, user.id))
-    became_confirm = vote == "confirm" and (existing is None or existing.vote != "confirm")
     if existing is None:
-        session.add(ReportVote(report_id=report.id, user_id=user.id, vote=vote, created_at=now))
+        existing = ReportVote(report_id=report.id, user_id=user.id, vote=vote, created_at=now)
     else:
         existing.vote = vote
         existing.created_at = now
-        session.add(existing)
-    if became_confirm:
+    if vote == "confirm" and not existing.extended:
         rule = TYPE_RULES[report.type]
         report.last_confirmed_at = now
         report.expires_at = max(report.expires_at, now) + timedelta(minutes=rule.extend_min)
+        existing.extended = True
         session.add(report)
+    session.add(existing)
 
 
 def _get_report(session: Session, report_id: str) -> Report:

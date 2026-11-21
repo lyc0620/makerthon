@@ -31,4 +31,7 @@ class ReportVote(SQLModel, table=True):
     report_id: int = Field(foreign_key="reports.id", primary_key=True)
     user_id: int = Field(foreign_key="users.id", primary_key=True)
     vote: str = Field(max_length=10)  # confirm / deny
+    # 이 사람이 시간을 이미 연장해 줬는지. 한 사람은 제보 하나에 한 번만 연장할 수 있어요
+    # (확인 → 없어요 → 확인을 반복해서 계속 늘리는 걸 막아요)
+    extended: bool = Field(default=False, nullable=False)
     created_at: datetime = Field(default_factory=now_utc, sa_type=UTCDateTime, nullable=False)

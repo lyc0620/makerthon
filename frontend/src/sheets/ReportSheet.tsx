@@ -33,7 +33,9 @@ export function ReportSheet({ id }: { id: string }) {
           setThankedId(r.id);
           toast(
             v === "confirm"
-              ? "확인해 줘서 고마워요! 15분 더 보여요."
+              ? res.expires_at !== r.expires_at
+                ? "확인해 줘서 고마워요! 15분 더 보여요."
+                : "다시 확인했어요. 시간 연장은 한 사람당 한 번이에요."
               : res.is_active
                 ? "알려 줘서 고마워요."
                 : "제보를 내렸어요. 고마워요!",
@@ -150,7 +152,7 @@ export function ReportSheet({ id }: { id: string }) {
               ? "고마워요! 덕분에 다른 친구들이 안전하게 다녀요 🙌"
               : r.my_vote
                 ? `내 표: ${r.my_vote === "confirm" ? "아직 있어요" : "없어졌어요"} · 다른 쪽을 누르면 바꿀 수 있어요`
-                : "'아직 있어요'는 15분 더 보이게, '없어졌어요'가 많으면 바로 내려가요."}
+                : "'아직 있어요'는 한 사람당 한 번 15분 더 보이게, '없어졌어요'가 많으면 바로 내려가요."}
           </p>
         </section>
       )}

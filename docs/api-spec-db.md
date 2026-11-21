@@ -134,6 +134,7 @@
 | `hazard` | 공사·위험 (예비) | 60분 | 30분 | 50m |
 
 - 경찰은 금방 이동하니까 v2 초안(60분)보다 짧게 잡았어요
+- **연장은 한 사람당 한 번만**: 같은 사람이 확인 → 없어요 → 확인을 반복해도 처음 한 번만 늘어나요 (`report_votes.extended`로 기억)
 - **합치기**: 같은 type의 활성 제보가 반경 안에 있으면 새로 만들지 않고 그 제보에 `confirm` 투표한 것으로 처리 → 응답의 `merged: true`
 - **숨김**: `deny ≥ 2` 이면서 `deny > confirm` 이면 바로 숨김. (v2 초안은 "deny가 confirm보다 3 많으면"이었는데, 사용자가 적은 발표 시연에서는 3표 차이가 거의 안 나와서 바꿨어요)
 - **도배 방지**: 같은 사람은 2분에 한 번만 새 제보 → 429 `RATE_LIMITED` (합쳐지는 경우는 제외)
@@ -342,7 +343,7 @@ Caddy는 WebSocket을 별도 설정 없이 프록시해요. Uvicorn 워커 1개 
 | `review_tags` | review_id, tag — PK(review_id, tag) |
 | `review_likes` | review_id, user_id, created_at — PK(review_id, user_id) |
 | `reports` | id, type, user_id, lat, lng, description, status(`active`/`hidden`), created_at, last_confirmed_at, expires_at |
-| `report_votes` | report_id, user_id, vote(`confirm`/`deny`), created_at — PK(report_id, user_id) |
+| `report_votes` | report_id, user_id, vote(`confirm`/`deny`), extended(연장해 줬는지), created_at — PK(report_id, user_id) |
 | `meetups` | id, host_id, title, place_name, restaurant_id, lat, lng, meal_time, max_people, note, status, created_at |
 | `meetup_members` | meetup_id, user_id, joined_at — PK(meetup_id, user_id) |
 | `meetup_messages` | id, meetup_id, user_id, content, created_at |

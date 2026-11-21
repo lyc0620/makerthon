@@ -145,6 +145,24 @@ def test_my_vote_and_revote(client, clock):
     assert_error(vote(client, b, "rpt_999", "deny"), 404, "NOT_FOUND")
 
 
+def test_confirm_deny_confirm_extends_only_once(client, clock):
+    """확인 → 없어요 → 확인을 반복해도 한 사람은 처음 한 번만 15분 연장돼요 (사용자가 찾은 버그)."""
+    a, b = login(client, "사슴"), login(client, "고양이")
+    report = post_report(client, a).json()
+    once = vote(client, b, report["id"], "confirm").json()["expires_at"]
+    for _ in range(3):
+        clock.advance(minutes=1)
+        vote(client, b, report["id"], "deny")
+        again = vote(client, b, report["id"], "confirm").json()
+        assert again["expires_at"] == once and again["confirm_count"] == 1
+
+    # 처음에 '없어요'를 눌렀다가 나중에 '확인'으로 바꾼 사람은 그때 한 번 연장돼요
+    c = login(client, "여우")
+    vote(client, c, report["id"], "deny")
+    late = vote(client, c, report["id"], "confirm").json()
+    assert late["expires_at"] > once
+
+
 def test_expired_report(client, clock):
     a, b = login(client, "사슴"), login(client, "고양이")
     report = post_report(client, a).json()
