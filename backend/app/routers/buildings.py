@@ -12,7 +12,7 @@ router = APIRouter(prefix="/buildings", tags=["buildings"])
 @router.get("", response_model=ListResponse[BuildingOut])
 def list_buildings(session: Session = Depends(get_session)):
     items = session.exec(select(Building).order_by(Building.id)).all()
-    return ListResponse(items=items, count=len(items), updated_at=None)
+    return ListResponse(items=items, count=len(items), total=len(items), updated_at=None)
 
 
 @router.get("/{building_id}", response_model=BuildingOut)

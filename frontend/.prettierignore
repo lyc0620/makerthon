@@ -1,0 +1,21 @@
+# 팀원(DB 파트) 파일은 그쪽 포맷(큰따옴표·120자)을 유지한다 — prettier --write src 로 다시 포맷하지 않게
+src/api/clientDb.ts
+src/api/types.db.ts
+src/api/hooks/db/
+src/components/db/
+src/layers/RestaurantLayer.tsx
+src/layers/ReportLayer.tsx
+src/layers/MeetupLayer.tsx
+src/layers/PresenceLayer.tsx
+src/layers/labelPlacement.ts
+src/layers/mapObstacles.ts
+src/layers/useMapZoom.ts
+src/lib/dbFormat.ts
+src/lib/notify.ts
+src/lib/nicknames.ts
+src/panels/
+src/sheets/RestaurantSheet.tsx
+src/sheets/ReportSheet.tsx
+src/sheets/MeetupSheet.tsx
+src/sheets/PresenceSheet.tsx
+src/store/db.ts

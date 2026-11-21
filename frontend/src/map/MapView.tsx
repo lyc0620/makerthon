@@ -6,7 +6,9 @@ import type { StyleSpecification } from 'maplibre-gl'
 import { type ReactNode, useEffect, useState } from 'react'
 import { GeolocateControl, Map, NavigationControl } from 'react-map-gl/maplibre'
 
+import { usePickStore } from '../store/db'
 import { useUi } from '../store/ui'
+import DbMapExtras from './DbMapExtras'
 import { DEM_SOURCE_ID, loadStylizedStyle, PALETTE, VIEW_BOUNDS } from './stylize'
 
 const PITCH_3D = 50
@@ -59,7 +61,8 @@ export default function MapView({ children }: Props) {
       terrain={
         typeof mapStyle === 'string' ? undefined : { source: DEM_SOURCE_ID, exaggeration: 1.4 }
       }
-      style={{ position: 'absolute', inset: 0 }}
+      // isolation: 마커의 z-index 가 지도 안에서만 통하게 (패널·바텀시트 위로 올라오지 않게)
+      style={{ position: 'absolute', inset: 0, isolation: 'isolate' }}
       attributionControl={{ compact: true }}
       maxPitch={75} // 많이 기울이면 뒤쪽 산과 하늘이 보인다
       maxBounds={VIEW_BOUNDS} // 캠퍼스·현풍읍·유가읍·주변 산지 밖으로는 이동하지 않는다
@@ -68,8 +71,13 @@ export default function MapView({ children }: Props) {
         // 개발 중 콘솔에서 시점을 조정해 볼 수 있게 (window.__map.jumpTo({ pitch: 60 }))
         if (import.meta.env.DEV) (window as unknown as { __map: unknown }).__map = e.target
       }}
-      onClick={() => select(null)} // 빈 곳을 누르면 바텀시트 닫기 (마커는 이벤트 전파를 막는다)
+      onClick={(e) => {
+        // "지도에서 위치 찍기"(제보·가게·약속 장소) 중이면 그 클릭은 찍기에 쓴다 (DB 파트)
+        if (usePickStore.getState().handleClick({ lng: e.lngLat.lng, lat: e.lngLat.lat })) return
+        select(null) // 빈 곳을 누르면 바텀시트 닫기 (마커는 이벤트 전파를 막는다)
+      }}
     >
+      <DbMapExtras />
       {/* 항상 3D: 회전·기울기가 있으므로 나침반(누르면 북쪽·수평으로 복귀)을 보여 준다 */}
       <NavigationControl
         position="top-right"

@@ -2,9 +2,13 @@ import { type Tab, useUi } from '../store/ui'
 
 const TABS: { key: Tab; label: string; icon: string }[] = [
   { key: 'map', label: '지도', icon: '🗺️' },
+  { key: 'restaurant', label: '맛집', icon: '🍜' },
+  { key: 'meetup', label: '밥친구', icon: '🍚' },
   { key: 'seminars', label: '세미나', icon: '🎤' },
   { key: 'bus', label: '버스', icon: '⭐' },
 ]
+// 지도 위 "제보" 버튼으로 연 화면은 하단 탭에서는 '지도'로 보인다
+const shownTab = (t: Tab): Tab => (t === 'report' ? 'map' : t)
 
 export default function TabBar() {
   const tab = useUi((s) => s.tab)
@@ -21,9 +25,9 @@ export default function TabBar() {
             setTab(key)
             select(null)
           }}
-          aria-current={tab === key ? 'page' : undefined}
+          aria-current={shownTab(tab) === key ? 'page' : undefined}
           className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-xs ${
-            tab === key ? 'font-semibold text-slate-900' : 'text-slate-400'
+            shownTab(tab) === key ? 'font-semibold text-slate-900' : 'text-slate-400'
           }`}
         >
           <span className="text-lg" aria-hidden>

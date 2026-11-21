@@ -1,0 +1,37 @@
+"""제보 관련 테이블: reports, report_votes. 만료·숨김된 제보도 통계용으로 지우지 않아요."""
+
+from datetime import datetime
+
+from sqlalchemy import Index
+from sqlmodel import Field, SQLModel
+
+from app.core.timeutil import now_utc
+from app.models.types import UTCDateTime
+
+
+class Report(SQLModel, table=True):
+    __tablename__ = "reports"
+    __table_args__ = (Index("ix_reports_status_expires_at", "status", "expires_at"),)
+
+    id: int | None = Field(default=None, primary_key=True)
+    type: str = Field(max_length=20)
+    user_id: int = Field(foreign_key="users.id")
+    lat: float
+    lng: float
+    description: str | None = Field(default=None, max_length=100)
+    status: str = Field(default="active", max_length=10)  # active / hidden
+    created_at: datetime = Field(default_factory=now_utc, sa_type=UTCDateTime, nullable=False)
+    last_confirmed_at: datetime = Field(default_factory=now_utc, sa_type=UTCDateTime, nullable=False)
+    expires_at: datetime = Field(sa_type=UTCDateTime, nullable=False)
+
+
+class ReportVote(SQLModel, table=True):
+    __tablename__ = "report_votes"
+
+    report_id: int = Field(foreign_key="reports.id", primary_key=True)
+    user_id: int = Field(foreign_key="users.id", primary_key=True)
+    vote: str = Field(max_length=10)  # confirm / deny
+    # 이 사람이 마지막으로 시간을 연장해 준 때. 5분이 지나야 같은 사람이 다시 연장할 수 있어요
+    # (확인 → 없어요 → 확인을 빠르게 반복해서 계속 늘리는 걸 막아요)
+    extended_at: datetime | None = Field(default=None, sa_type=UTCDateTime, nullable=True)
+    created_at: datetime = Field(default_factory=now_utc, sa_type=UTCDateTime, nullable=False)

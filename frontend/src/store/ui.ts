@@ -6,10 +6,13 @@ export type SelectedItem =
   | { type: 'seminar'; id: string }
   | { type: 'restaurant'; id: string }
   | { type: 'report'; id: string }
+  | { type: 'meetup'; id: string } // DB 파트: 밥약속
+  | { type: 'presence'; id: string } // DB 파트: 지금 밥 먹을 사람
   | null
 
-export type LayerKey = 'bus' | 'seminar' | 'restaurant' | 'route' | 'report'
-export type Tab = 'map' | 'seminars' | 'bus'
+export type LayerKey = 'bus' | 'seminar' | 'restaurant' | 'route' | 'report' | 'meetup'
+// 'report' 는 하단 탭이 아니라 지도 위 "제보" 버튼으로 연다 (하단 탭에서는 '지도'로 표시)
+export type Tab = 'map' | 'restaurant' | 'meetup' | 'seminars' | 'bus' | 'report'
 
 type UiState = {
   layers: Record<LayerKey, boolean>
@@ -51,7 +54,8 @@ export const useUi = create<UiState>()(
         seminar: true,
         restaurant: true,
         route: true,
-        report: false,
+        report: true,
+        meetup: true, // 밥약속 + 지금 밥 먹을 사람
       },
       toggleLayer: (key) => set((s) => ({ layers: { ...s.layers, [key]: !s.layers[key] } })),
 
@@ -73,6 +77,11 @@ export const useUi = create<UiState>()(
       name: 'hyeonpung-map-ui',
       storage: safeStorage,
       partialize: (s) => ({ favoriteStops: s.favoriteStops, layers: s.layers }),
+      // 예전에 저장된 값에 새 레이어 키가 없어도 기본값(켜짐)을 쓰게 합친다
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<UiState>
+        return { ...current, ...p, layers: { ...current.layers, ...(p.layers ?? {}) } }
+      },
     },
   ),
 )

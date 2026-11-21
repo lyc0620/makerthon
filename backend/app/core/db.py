@@ -5,7 +5,7 @@ from pathlib import Path
 from sqlalchemy import DateTime, event
 from sqlalchemy.engine import Engine
 from sqlalchemy.types import TypeDecorator
-from sqlmodel import Session, create_engine
+from sqlmodel import Session, SQLModel, create_engine
 
 from app.core.config import get_settings
 from app.core.time import KST
@@ -72,6 +72,13 @@ def reset_engine() -> None:
     if _engine is not None:
         _engine.dispose()
     _engine = None
+
+
+def create_db_and_tables(engine: Engine | None = None) -> None:
+    """마이그레이션 없이 테이블을 바로 만든다 (DB 파트 테스트·개발용). 운영은 Alembic."""
+    import app.models  # noqa: F401  (테이블 등록용)
+
+    SQLModel.metadata.create_all(engine or get_engine())
 
 
 def get_session() -> Iterator[Session]:

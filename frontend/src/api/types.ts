@@ -4,7 +4,8 @@ export type ISODateTime = string // "2026-12-01T16:00:00+09:00"
 
 export type ListResponse<T> = {
   items: T[]
-  count: number
+  count: number // 이번 응답의 개수
+  total: number // 조건에 맞는 전체 개수
   updated_at: ISODateTime | null
 }
 

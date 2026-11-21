@@ -1,6 +1,10 @@
 import { useEffect } from 'react'
 
 import BusStopSheet from '../sheets/BusStopSheet'
+import { MeetupSheet } from '../sheets/MeetupSheet'
+import { PresenceSheet } from '../sheets/PresenceSheet'
+import { ReportSheet } from '../sheets/ReportSheet'
+import { RestaurantSheet } from '../sheets/RestaurantSheet'
 import SeminarSheet from '../sheets/SeminarSheet'
 import { useUi } from '../store/ui'
 
@@ -25,6 +29,19 @@ export default function BottomSheet() {
     case 'seminar':
       content = <SeminarSheet id={selected.id} />
       break
+    // DB 파트
+    case 'restaurant':
+      content = <RestaurantSheet id={selected.id} onSelect={select} />
+      break
+    case 'report':
+      content = <ReportSheet id={selected.id} />
+      break
+    case 'meetup':
+      content = <MeetupSheet id={selected.id} onSelect={select} />
+      break
+    case 'presence':
+      content = <PresenceSheet id={selected.id} onSelect={select} />
+      break
     default:
       content = <p className="text-sm text-slate-500">준비 중인 기능입니다.</p>
   }
@@ -33,7 +50,7 @@ export default function BottomSheet() {
     <section
       role="dialog"
       aria-modal="false"
-      className="absolute inset-x-0 bottom-0 z-10 max-h-[60%] overflow-y-auto rounded-t-2xl bg-white px-4 pt-2 pb-4 shadow-[0_-4px_24px_rgba(0,0,0,0.12)]"
+      className="absolute inset-x-0 bottom-0 z-20 max-h-[60%] overflow-y-auto rounded-t-2xl bg-white px-4 pt-2 pb-4 shadow-[0_-4px_24px_rgba(0,0,0,0.12)]"
     >
       <div className="sticky top-0 -mx-4 flex items-center justify-center bg-white pb-2">
         <span className="h-1.5 w-10 rounded-full bg-slate-300" aria-hidden />
@@ -46,7 +63,9 @@ export default function BottomSheet() {
           ×
         </button>
       </div>
-      {content}
+      <div key={`${selected.type}:${selected.id}`} className="sheet-fade">
+        {content}
+      </div>
     </section>
   )
 }

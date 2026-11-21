@@ -1,4 +1,34 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
+/* 팔레트: 파란색(brand) + 노란색(sun). 밝은 바탕을 써요. */
+@theme {
+  --color-brand-50: #eef4fc;
+  --color-brand-100: #d9e6f8;
+  --color-brand-200: #b3cdf1;
+  --color-brand-300: #82abe5;
+  --color-brand-400: #5089d9;
+  --color-brand-500: #2f74d6;
+  --color-brand-600: #1f5fbf;
+  --color-brand-700: #184c99;
+  --color-brand-800: #123a75;
+  --color-brand-900: #0d2a55;
+
+  --color-sun-50: #fffaeb;
+  --color-sun-100: #fff4d1;
+  --color-sun-200: #ffe9a3;
+  --color-sun-300: #ffd96e;
+  --color-sun-400: #ffc83d;
+  --color-sun-500: #f5b400;
+  --color-sun-600: #d19700;
+
+  /* 카드·떠 있는 요소 공통 값 */
+  --radius-card: 1.25rem;
+  --shadow-card: 0 1px 2px rgba(13, 42, 85, 0.06), 0 4px 14px rgba(13, 42, 85, 0.06);
+  --shadow-float: 0 6px 24px rgba(13, 42, 85, 0.16), 0 1px 3px rgba(13, 42, 85, 0.08);
+
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+    "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+}
 
 html,
 body,
@@ -7,15 +37,246 @@ body,
   margin: 0;
 }
 
+/*
+ * 글자 크기 규칙 (Tailwind 클래스로 맞춰 주세요)
+ *   제목     18px / 800  → text-lg font-extrabold
+ *   섹션     14px / 700  → text-sm font-bold
+ *   본문     14px / 500  → text-sm font-medium
+ *   설명     12px / 500  → text-xs font-medium
+ *   아주 작게 11px / 600 → text-[11px] font-semibold
+ * 카드: rounded-card shadow-card / 떠 있는 것: shadow-float
+ */
 body {
-  background: #f8fafc;
+  margin: 0;
+  background: #f5f8fd;
   color: #0f172a;
-  font-family:
-    'Pretendard',
-    system-ui,
-    -apple-system,
-    'Apple SD Gothic Neo',
-    'Malgun Gothic',
-    sans-serif;
+  -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
+  /* 한국어가 단어 중간에서 끊기거나 한 글자만 다음 줄로 넘어가지 않게 해요. */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* 자기 포커스 스타일이 없는 버튼·링크에도 키보드 포커스 테두리를 보여 줘요.
+ * @layer base 안에 둬야 컴포넌트의 focus-visible:outline-* 유틸리티가 이겨요.
+ * (레이어 밖 규칙은 우선순위와 상관없이 Tailwind 유틸리티를 이겨 버려요) */
+@layer base {
+  :where(button, a, [role="button"]):focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+}
+
+/* ─── 제보 핀이 두근두근 퍼지는 효과 ─── */
+@keyframes report-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+.report-pulse {
+  animation: report-pulse 1.8s ease-out infinite;
+}
+
+/* ─── 토스트 등장 ─── */
+@keyframes toast-in {
+  from {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.toast-in {
+  animation: toast-in 0.2s ease-out;
+}
+
+/* ─── 마커 살짝 튀어오르기 ─── */
+.marker-pop {
+  transition:
+    transform 0.15s ease,
+    translate 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.marker-pop:hover {
+  transform: translateY(-2px) scale(1.08);
+}
+
+/* 모바일: 확대·내 위치 버튼을 가장 낮은 바텀시트 위로 올려요.
+ * maplibre-gl.css가 레이어 밖에서 bottom:0을 주기 때문에 Tailwind 유틸리티로는 못 이겨요. 그래서 여기 둬요. */
+.hp-map-mobile .maplibregl-ctrl-bottom-right {
+  bottom: var(--hp-ctrl-bottom, 0px);
+}
+
+/* 가로 스크롤 줄(칩 목록)의 스크롤바 숨기기 */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── 지금 밥 먹을 사람 점 주변으로 부드럽게 퍼지는 동그라미 ─── */
+@keyframes presence-pulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+.presence-pulse {
+  animation: presence-pulse 2.4s ease-out infinite;
+}
+
+/* ─── "같이 먹자" 카드가 위에서 쏙 내려오기 ─── */
+@keyframes invite-in {
+  from {
+    transform: translateY(-12px) scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.invite-in {
+  animation: invite-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+/* ─── 움직임 규칙 ─── */
+/* 마커가 처음 나타날 때 살짝 커지며 등장 */
+@keyframes marker-enter {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+/* backwards: 끝난 뒤엔 transform을 붙잡지 않아서 hover 튀어오르기가 그대로 동작해요. */
+.marker-enter {
+  animation: marker-enter 220ms cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards;
+}
+
+/* 고른 마커가 한 번 통 튀기 */
+@keyframes marker-selected {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-6px);
+  }
+  70% {
+    transform: translateY(1px);
+  }
+}
+.marker-selected {
+  animation: marker-selected 300ms ease-out;
+}
+/* 등장 애니메이션 이름을 목록에 남겨 둬서, 선택을 풀 때 마커가 다시 "등장"하지 않게 해요. */
+.marker-enter.marker-selected {
+  animation:
+    marker-enter 220ms cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards,
+    marker-selected 300ms ease-out;
+}
+
+/* 탭 바꿈·상세 열기 */
+@keyframes sheet-fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.sheet-fade {
+  animation: sheet-fade 180ms ease-out;
+}
+
+/* 불러오는 동안 보여 주는 반짝이는 자리 */
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--color-brand-50) 25%, #ffffff 50%, var(--color-brand-50) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s linear infinite;
+  /* 모서리는 rounded-* 유틸리티로 정해요. (여기서 정하면 rounded-full이 무시돼요) */
+}
+
+/* 토스트 남은 시간 막대 */
+@keyframes toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+.toast-progress {
+  transform-origin: left;
+  animation: toast-progress linear forwards;
+}
+
+/* 누를 때 살짝 들어가기 */
+.press {
+  transition:
+    transform 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
+}
+.press:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-pulse,
+  .toast-in,
+  .presence-pulse,
+  .invite-in,
+  .marker-enter,
+  .marker-selected,
+  .marker-enter.marker-selected,
+  .sheet-fade,
+  .toast-progress {
+    animation: none;
+  }
+  .skeleton {
+    animation: none;
+    background: var(--color-brand-50);
+  }
+  .marker-pop,
+  .marker-pop:hover,
+  .press,
+  .press:active {
+    transition: none;
+    transform: none;
+  }
 }

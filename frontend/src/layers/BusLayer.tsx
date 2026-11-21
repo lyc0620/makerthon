@@ -1,7 +1,7 @@
 import { Marker } from 'react-map-gl/maplibre'
 
 import { useBusStops } from '../api/hooks/bus'
-import MapPin from '../components/MapPin'
+import MapPin, { PIN_COLORS } from '../components/MapPin'
 import { useUi } from '../store/ui'
 import type { LayerProps } from './types'
 
@@ -27,8 +27,8 @@ export default function BusLayer({ visible }: LayerProps) {
       >
         <MapPin
           icon="🚌"
-          color="#0ea5e9"
-          activeColor="#0369a1"
+          color={PIN_COLORS.bus[0]}
+          activeColor={PIN_COLORS.bus[1]}
           active={active}
           label={`${stop.name} 정류장`}
         />

@@ -11,8 +11,11 @@ class BaseModel(_BaseModel):
 
 
 class ListResponse[T](BaseModel):
+    """목록 응답. count = 이번 응답의 개수, total = 조건에 맞는 전체 개수 (페이지용, DB 파트 규격과 같음)"""
+
     items: list[T]
     count: int
+    total: int
     updated_at: datetime | None = None
 
 

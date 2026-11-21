@@ -20,7 +20,7 @@ def get_bus_service(request: Request) -> BusService:
 @router.get("/stops", response_model=ListResponse[BusStopOut])
 def list_stops(session: Session = Depends(get_session)):
     items = session.exec(select(BusStop).order_by(BusStop.id)).all()
-    return ListResponse(items=items, count=len(items), updated_at=None)
+    return ListResponse(items=items, count=len(items), total=len(items), updated_at=None)
 
 
 @router.get("/arrivals", response_model=BusArrivalsResponse)
@@ -42,5 +42,5 @@ def arrivals(
     now = now_kst()
     items = [StopArrivalsOut(stop_id=i, arrivals=bus.get_arrivals(i, now)) for i in ids]
     return BusArrivalsResponse(
-        items=items, count=len(items), updated_at=bus.updated_at, is_stale=bus.is_stale(now)
+        items=items, count=len(items), total=len(items), updated_at=bus.updated_at, is_stale=bus.is_stale(now)
     )

@@ -4,6 +4,9 @@ import { type LayerKey, useUi } from '../store/ui'
 const ITEMS: { key: LayerKey; label: string; icon: string }[] = [
   { key: 'bus', label: '버스', icon: '🚌' },
   { key: 'seminar', label: '세미나', icon: '🎤' },
+  { key: 'restaurant', label: '맛집', icon: '🍜' },
+  { key: 'report', label: '제보', icon: '🚨' },
+  { key: 'meetup', label: '밥친구', icon: '🍚' },
 ]
 
 export default function LayerToggle() {
@@ -11,7 +14,7 @@ export default function LayerToggle() {
   const toggle = useUi((s) => s.toggleLayer)
 
   return (
-    <div className="pointer-events-auto flex gap-2 overflow-x-auto px-4 py-3">
+    <div className="no-scrollbar pointer-events-auto flex min-w-0 flex-1 gap-2 overflow-x-auto py-3 pl-4">
       {ITEMS.map(({ key, label, icon }) => {
         const on = !!layers[key]
         return (

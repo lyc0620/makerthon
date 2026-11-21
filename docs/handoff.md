@@ -98,6 +98,17 @@
 - 상태 확인: `GET /api/v1/admin/crawl-status`.
 - 현재 로컬 DB 에 실제 세미나 33건 (모두 건물 매핑됨, 이번 주 핀은 6개 건물).
 
+### 00.6.1 DB 파트 통합 완료 (2026-11-21, 브랜치 `feat/lyc0620-integration`)
+`origin/feat/db-part`(291c5a7 까지)를 머지했다. 아래 00.7 의 db-part 메모대로 처리했고, 결정은 사용자와 정했다.
+- 백엔드: Settings 는 우리 소문자 필드 + 대문자 `@property` 별칭. 에러는 그쪽 `AppError` 기반, 우리 `ApiError(status, msg)` 는 하위 클래스. Alembic 은 `17adb2052d3f.down_revision = 499aea6d3d2f` 로 한 줄. 목록 응답은 모두 `count`(이번 개수)+`total`(전체). conftest 는 그쪽 픽스처(`db_url/engine/app/client/clock`, `login` 등) + 마이그레이션 경유. 백그라운드 루프(`cleanup_loop`, `reminder_loop`)는 `scheduler_enabled` 일 때만. **로컬 `.env` 에 `APP_ENV=dev` 필수**(없으면 JWT 기본값 때문에 서버가 안 켜짐).
+- 서비스 지역: 중심 = 지도 지역 원 중심(35.700, 128.4575), 반경 **3km**(원 가장자리 구름 밖은 안 보이므로). 테스트는 그쪽 좌표·8km 그대로.
+- 로그인: 시연까지 **닉네임 개발 로그인 유지**(`AccountButton`, 오른쪽 위). 이메일 인증(6.7)은 배포 뒤.
+- 프론트: 하단 탭 **지도·맛집·밥친구·세미나·버스**, 경찰 제보는 지도 왼쪽 아래 "🚨 제보" 버튼(`tab='report'`). 패널은 `components/DbPanel.tsx`(지도 아래쪽, 위치 찍기 중엔 안내 띠). 선택 상태는 `store/ui.ts` 하나 — `store/db.ts` 의 `useSelectionStore` 는 그걸 보여 주는 창구. `openCreate` 는 밥친구 탭으로 전환. `src/dev/` 는 버림(닉네임 추천만 `lib/nicknames.ts` 로).
+- 핀: 버스·세미나·제보와 맛집/밥약속의 "작은 점"은 공통 `MapPin`(색은 `PIN_COLORS`). 맛집·밥약속 **이름표 말풍선과 겹침 피하기는 그쪽 것 그대로**.
+- 지도 div 에 `isolation: isolate` (마커가 패널 위로 올라오던 문제).
+- 예시 데이터: `uv run python -m seed.db_sample` (모두 "[예시]"). 예시 제보는 만료된 기록뿐이라 지도엔 안 뜸.
+- 남은 것: 그쪽 파일의 oxlint 경고 9개(동작 문제 없음), 루프·웹소켓 다중 워커 불가(워커 1개 전제 유지), `feat/dohyeon-route` 통합.
+
 ### 00.7 팀원 브랜치 통합 메모 (다음에 합칠 때 그대로 쓰기)
 **`feat/dohyeon-route` (김도현)** — 우리와 겹치는 파일은 빈 `__init__.py` 와 README 뿐, 거의 그대로 합쳐진다(한 번 해 봤음).
 - 백엔드: `app/routers/route.py`(`GET /route`, `GET /running-routes`), `app/services/route/graph.py`(표준 라이브러리 Dijkstra), `seed/walk_graph.json`(노드 6,233), `scripts/build_walk_graph.py`, `tests/test_route.py`. main 에서 `app.include_router(route.router, prefix="/api/v1")`.

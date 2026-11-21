@@ -111,8 +111,8 @@ def test_seminar_endpoints(client, session):
     assert client.get("/api/v1/seminars?building_id=bld_E8").json()["count"] == 1
     assert client.get("/api/v1/seminars?category=event").json()["count"] == 2
     assert client.get("/api/v1/seminars?q=로봇").json()["count"] == 1
-    assert client.get("/api/v1/seminars?limit=1").json()["count"] == 4
-    assert len(client.get("/api/v1/seminars?limit=1").json()["items"]) == 1
+    page = client.get("/api/v1/seminars?limit=1").json()
+    assert (page["count"], page["total"], len(page["items"])) == (1, 4, 1)  # count=이번 개수, total=전체
 
     sid = body["items"][0]["id"]
     assert client.get(f"/api/v1/seminars/{sid}").json()["id"] == sid

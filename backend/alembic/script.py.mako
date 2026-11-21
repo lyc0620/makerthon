@@ -10,7 +10,8 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 import sqlmodel  # noqa: F401
-import app.core.db  # noqa: F401
+import app.core.db  # noqa: F401  (TZDateTime 컬럼용)
+import app.models.types  # noqa: F401  (UTCDateTime 컬럼용 — DB 파트)
 ${imports if imports else ""}
 
 # revision identifiers, used by Alembic.

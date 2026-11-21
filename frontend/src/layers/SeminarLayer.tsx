@@ -3,7 +3,7 @@ import { Marker } from 'react-map-gl/maplibre'
 
 import { useSeminars } from '../api/hooks/seminars'
 import type { Seminar } from '../api/types'
-import MapPin from '../components/MapPin'
+import MapPin, { PIN_COLORS } from '../components/MapPin'
 import { useUi } from '../store/ui'
 import type { LayerProps } from './types'
 
@@ -42,8 +42,8 @@ export default function SeminarLayer({ visible }: LayerProps) {
       >
         <MapPin
           icon="🎤"
-          color="#6366f1"
-          activeColor="#4338ca"
+          color={PIN_COLORS.seminar[0]}
+          activeColor={PIN_COLORS.seminar[1]}
           active={active}
           count={list.length}
           label={`세미나 ${list.length}건`}

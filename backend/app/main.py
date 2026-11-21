@@ -1,22 +1,38 @@
 import asyncio
+import contextlib
 import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from alembic import command
 from alembic.config import Config
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, func, select
 
+from app.core.auth import decode_user_id
 from app.core.config import BACKEND_DIR, get_settings
-from app.core.db import get_engine
-from app.core.errors import register_error_handlers
-from app.models import Seminar
-from app.routers import admin, buildings, bus, health, seminars
+from app.core.db import create_db_and_tables, get_engine
+from app.core.errors import install_error_handlers
+from app.models import Seminar, User
+from app.routers import (
+    admin,
+    buildings,
+    bus,
+    dev_auth,
+    health,
+    meetups,
+    presence,
+    reports,
+    restaurants,
+    seminars,
+)
 from app.scheduler import build_scheduler, crawl_seminars, refresh_bus
 from app.seed_loader import load_seeds, load_shuttle_timetable
 from app.services.bus.service import BusService, make_source
+from app.services.meetup_notify import reminder_loop
+from app.services.presence import cleanup_loop
+from app.services.realtime import hub
 from app.services.seminar.pipeline import make_crawler, remap_places
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -36,6 +52,8 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
     if settings.auto_migrate:
         run_migrations()
+    elif settings.is_dev:
+        create_db_and_tables()  # 마이그레이션을 끈 개발 환경에서도 테이블은 있게
     with Session(get_engine()) as session:
         log.info("seed loaded: %s", load_seeds(session))
         log.info("seminar places re-mapped: %s", remap_places(session))
@@ -58,6 +76,9 @@ async def lifespan(app: FastAPI):
         )
         sched = build_scheduler(settings, app.state.bus, crawler)
         sched.start()
+        # DB 파트: 실시간 위치 정리(30초마다), 밥약속 10분 전 알림(30초마다)
+        tasks.append(asyncio.create_task(cleanup_loop()))
+        tasks.append(asyncio.create_task(reminder_loop()))
     try:
         yield
     finally:
@@ -65,6 +86,22 @@ async def lifespan(app: FastAPI):
             sched.shutdown(wait=False)
         for t in tasks:
             t.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await t
+
+
+def _ws_user_id(token: str | None) -> int | None:
+    """웹소켓 토큰 → 사용자 id. 틀리거나 사용자가 없으면 None(익명 연결)."""
+    if not token:
+        return None
+    user_id = decode_user_id(token)
+    if user_id is None:
+        return None
+    try:
+        with Session(get_engine()) as session:
+            return user_id if session.get(User, user_id) is not None else None
+    except Exception:  # DB 를 못 읽어도 연결은 익명으로 받는다
+        return None
 
 
 def create_app() -> FastAPI:
@@ -73,12 +110,29 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
+        allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    register_error_handlers(app)
+    install_error_handlers(app)
     for r in (health.router, buildings.router, bus.router, seminars.router, admin.router):
         app.include_router(r, prefix="/api/v1")
+    # DB 파트 라우터는 경로에 /api/v1 을 이미 포함한다
+    for r in (restaurants.router, reports.router, meetups.router, presence.router):
+        app.include_router(r)
+    if settings.is_dev:
+        app.include_router(dev_auth.router)  # 닉네임만으로 로그인 — 개발·시연용
+
+    @app.websocket("/api/v1/ws")
+    async def websocket_endpoint(ws: WebSocket, token: str | None = None):
+        # ?token=<JWT> 가 맞으면 로그인한 연결, 아니면 공개 알림만 받는 익명 연결
+        await hub.connect(ws, _ws_user_id(token))
+        try:
+            while True:
+                await ws.receive_text()  # 연결 유지용 (내용은 쓰지 않음)
+        except WebSocketDisconnect:
+            await hub.disconnect(ws)
+
     return app
 
 

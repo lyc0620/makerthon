@@ -46,7 +46,7 @@ def list_seminars(
 
     total = session.exec(select(func.count()).select_from(stmt.subquery())).one()
     items = session.exec(stmt.order_by(col(Seminar.start_at)).offset(offset).limit(limit)).all()
-    return ListResponse(items=items, count=total, updated_at=_last_crawl(session))
+    return ListResponse(items=items, count=len(items), total=total, updated_at=_last_crawl(session))
 
 
 @router.get("/{seminar_id}", response_model=SeminarOut)
