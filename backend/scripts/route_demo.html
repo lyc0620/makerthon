@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>현풍 길찾기 데모</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: #fff; }
+  #map { position: absolute; inset: 0; }
+  #panel {
+    position: absolute; top: 12px; left: 12px; right: 12px; max-width: 360px;
+    background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.18);
+    padding: 12px; font-size: 14px; z-index: 1;
+  }
+  .tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+  .tabs button, .row button {
+    flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 8px; background: #f6f6f6; cursor: pointer;
+  }
+  .tabs button.on { background: #2563eb; color: #fff; border-color: #2563eb; }
+  .row { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+  .row input[type=number] { width: 70px; padding: 6px; }
+  #msg { margin-top: 8px; color: #333; line-height: 1.5; }
+  .course { padding: 6px 8px; border-radius: 6px; margin-top: 4px; cursor: pointer; border-left: 6px solid; background: #f8f8f8; }
+  .course.sel { background: #e8efff; }
+  .row input[type=search] { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; }
+  #plan {
+    position: absolute; left: 12px; right: 12px; bottom: 12px; max-width: 560px; z-index: 1;
+    background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.18); padding: 10px; font-size: 13px;
+  }
+  #plan .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px; }
+  #plan .imgwrap { position: relative; width: 100%; }
+  #plan img { width: 100%; display: block; border-radius: 6px; }
+  #plan .dot {
+    position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%;
+    border: 4px solid #dc2626; background: rgba(220,38,38,.15); animation: pulse 1.2s infinite;
+  }
+  @keyframes pulse { 50% { transform: scale(1.35); opacity: .6; } }
+  #plan .src { color: #777; font-size: 11px; margin-top: 4px; }
+  [hidden] { display: none !important; }  /* #plan img의 display:block이 hidden을 덮지 않게 */
+  #plan button { padding: 6px 10px; border: 1px solid #ccc; border-radius: 8px; background: #f6f6f6; cursor: pointer; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="panel">
+  <div class="tabs">
+    <button id="tab-route" class="on">길찾기</button>
+    <button id="tab-run">러닝 코스</button>
+    <button id="tab-room">강의실</button>
+  </div>
+  <div id="room-ui" hidden>
+    <div class="row">
+      <input id="q" type="search" placeholder="예: L21, E7 233, 멀티미디어, 도서관" />
+      <button id="find">검색</button>
+    </div>
+  </div>
+  <div id="route-ui">
+    <div class="row">
+      <label><input type="radio" name="mode" value="walk" checked /> 걷기</label>
+      <label><input type="radio" name="mode" value="run" /> 달리기</label>
+      <button id="clear">초기화</button>
+    </div>
+  </div>
+  <div id="run-ui" hidden>
+    <div class="row">
+      목표 <input id="km" type="number" min="1" max="21" step="0.5" value="5" /> km
+      <button id="go">코스 추천</button>
+    </div>
+  </div>
+  <div class="row"><label><input id="three" type="checkbox" /> 3D 건물</label></div>
+  <div id="msg">지도에서 출발지를 클릭하세요.</div>
+</div>
+<div id="plan" hidden>
+  <div class="head">
+    <div id="plan-title"></div>
+    <div><span id="plan-3d"></span> <button id="plan-route">여기까지 길찾기</button> <button id="plan-close">닫기</button></div>
+  </div>
+  <div class="imgwrap"><img id="plan-img" alt="층별 안내도" /><div class="dot" id="plan-dot"></div></div>
+  <div class="src" id="plan-srcline">안내도 출처: <a id="plan-src" target="_blank" rel="noopener">DGIST School Facilities</a></div>
+</div>
+<script>
+// 파일을 직접 열면(file:, data: 등) 상대 경로가 안 되므로 개발 서버 주소로 보낸다
+const API = location.protocol.startsWith("http") ? "/api/v1" : "http://localhost:8000/api/v1";
+const COLORS = ["#2563eb", "#16a34a", "#ea580c"];
+let tab = "route", from = null, runStart = [35.7003, 128.4576], courses = [], selected = 0;
+const markers = [];
+
+const map = new maplibregl.Map({
+  container: "map",
+  style: "https://tiles.openfreemap.org/styles/liberty",
+  center: [128.4565, 35.7020],
+  zoom: 15,
+});
+map.addControl(new maplibregl.NavigationControl(), "bottom-right");
+
+map.on("load", () => {
+  map.addSource("route", { type: "geojson", data: { type: "FeatureCollection", features: lastFeatures } });
+  map.addLayer({ id: "route-casing", type: "line", source: "route",
+    layout: { "line-join": "round", "line-cap": "round" },
+    paint: { "line-color": "#fff", "line-width": ["case", ["get", "sel"], 10, 6] } });
+  map.addLayer({ id: "route-line", type: "line", source: "route",
+    layout: { "line-join": "round", "line-cap": "round" },
+    paint: { "line-color": ["get", "color"], "line-width": ["case", ["get", "sel"], 6, 3],
+             "line-opacity": ["case", ["get", "sel"], 1, 0.55] } });
+
+  // 3D 건물 (Buildings3DLayer와 같은 방식)
+  const src = Object.keys(map.getStyle().sources).find(k => map.getStyle().sources[k].type === "vector");
+  map.addLayer({ id: "buildings-3d", type: "fill-extrusion", source: src, "source-layer": "building",
+    minzoom: 14, layout: { visibility: "none" },
+    paint: { "fill-extrusion-color": "#d6d3d1",
+             "fill-extrusion-height": ["coalesce", ["get", "render_height"], 6],
+             "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], 0],
+             "fill-extrusion-opacity": 0.85 } });
+});
+
+function msg(html) { document.getElementById("msg").innerHTML = html; }
+function clearMarkers() { while (markers.length) markers.pop().remove(); }
+function addMarker(lat, lng, color) {
+  markers.push(new maplibregl.Marker({ color }).setLngLat([lng, lat]).addTo(map));
+}
+let lastFeatures = [];
+function draw(features) {
+  lastFeatures = features;
+  const src = map.getSource("route");  // 스타일 로드 전이면 아직 없음 → load 때 lastFeatures로 그림
+  if (src) src.setData({ type: "FeatureCollection", features });
+}
+function fmtMin(s) { return Math.round(s / 60) + "분"; }
+
+async function api(path) {
+  let r;
+  try {
+    r = await fetch(API + path);
+  } catch {
+    throw new Error("API 서버에 연결할 수 없습니다. backend 폴더에서 python -m uvicorn scripts.dev_route_server:app --port 8000 을 실행한 뒤 http://localhost:8000/ 으로 여세요.");
+  }
+  const body = await r.json();
+  if (!r.ok) throw new Error(body.error ? body.error.message : r.statusText);
+  return body;
+}
+
+map.on("click", async (e) => {
+  const { lat, lng } = e.lngLat;
+  if (tab === "room") return;
+  if (tab === "run") {
+    runStart = [lat, lng];
+    clearMarkers(); addMarker(lat, lng, "#111");
+    msg("출발점을 바꿨습니다. <b>코스 추천</b>을 누르세요.");
+    return;
+  }
+  if (!from) {
+    clearMarkers(); draw([]);
+    from = [lat, lng]; addMarker(lat, lng, "#16a34a");
+    msg("도착지를 클릭하세요.");
+    return;
+  }
+  addMarker(lat, lng, "#dc2626");
+  const mode = document.querySelector("input[name=mode]:checked").value;
+  msg("경로 계산 중...");
+  try {
+    const r = await api(`/route?from=${from[0]},${from[1]}&to=${lat},${lng}&mode=${mode}`);
+    draw([{ type: "Feature", geometry: r.geometry, properties: { color: COLORS[0], sel: true } }]);
+    msg(`<b>${(r.distance_m / 1000).toFixed(2)}km</b> · ${mode === "run" ? "달리기" : "걷기"} 약 <b>${fmtMin(r.duration_s)}</b><br/>다시 클릭하면 새 출발지`);
+  } catch (err) { msg("⚠ " + err.message); }
+  from = null;
+});
+
+function renderCourses() {
+  draw(courses.map((c, i) => ({ type: "Feature", geometry: c.geometry,
+    properties: { color: COLORS[i % 3], sel: i === selected } })));
+  msg(courses.length ? courses.map((c, i) =>
+    `<div class="course ${i === selected ? "sel" : ""}" style="border-color:${COLORS[i % 3]}" data-i="${i}">
+       <b>${c.name}</b> · ${(c.distance_m / 1000).toFixed(2)}km · 신호등 ${c.signal_count ?? "-"}개
+     </div>`).join("") : "조건에 맞는 코스가 없습니다. 거리를 바꿔 보세요.");
+  document.querySelectorAll(".course").forEach(el =>
+    el.onclick = () => { selected = +el.dataset.i; renderCourses(); });
+}
+
+document.getElementById("go").onclick = async () => {
+  const km = document.getElementById("km").value;
+  msg("코스 찾는 중...");
+  try {
+    const r = await api(`/running-routes?distance_km=${km}&lat=${runStart[0]}&lng=${runStart[1]}`);
+    courses = r.items; selected = 0;
+    clearMarkers(); addMarker(runStart[0], runStart[1], "#111");
+    renderCourses();
+  } catch (err) { msg("⚠ " + err.message); }
+};
+
+// ---------- 강의실 검색 ----------
+const GATE = [35.7003, 128.4576];
+let roomResults = [], roomSel = null;
+
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function roomLabel(it) {
+  const head = it.code ? `${it.building.name.split(" ")[0]} ${it.code}` : it.building.name;
+  return `${head}${it.name ? " · " + it.name : ""}${it.floor_label ? " (" + it.floor_label + ")" : ""}`;
+}
+
+async function findRoom() {
+  const q = document.getElementById("q").value.trim();
+  if (!q) return;
+  msg("검색 중...");
+  try {
+    const r = await api(`/campus/search?q=${encodeURIComponent(q)}`);
+    roomResults = r.items;
+    if (!roomResults.length) { msg("결과가 없습니다. 예: L21, E7 233, 멀티미디어"); return; }
+    msg(roomResults.map((it, i) =>
+      `<div class="course" style="border-color:${it.type === "room" ? "#dc2626" : "#2563eb"}" data-r="${i}">${esc(roomLabel(it))}</div>`
+    ).join(""));
+    document.querySelectorAll("[data-r]").forEach(el => el.onclick = () => showRoom(roomResults[+el.dataset.r]));
+    showRoom(roomResults[0]);
+  } catch (err) { msg("⚠ " + err.message); }
+}
+
+function showRoom(it) {
+  roomSel = it;
+  const b = it.building;
+  clearMarkers(); draw([]);
+  addMarker(b.lat, b.lng, "#dc2626");
+  map.flyTo({ center: [b.lng, b.lat], zoom: 17.5 });
+  const card = document.getElementById("plan");
+  document.getElementById("plan-title").innerHTML = `<b>${esc(roomLabel(it))}</b>`;
+  const img = document.getElementById("plan-img"), dot = document.getElementById("plan-dot");
+  document.getElementById("plan-srcline").hidden = !it.plan;
+  if (it.plan) {
+    img.hidden = false; dot.hidden = false;
+    img.src = API.replace(/\/api\/v1$/, "") + it.plan.image_url;  // image_url은 /api/v1/... 경로
+    dot.style.left = (it.x / it.plan.width * 100) + "%";
+    dot.style.top = (it.y / it.plan.height * 100) + "%";
+    document.getElementById("plan-src").href = it.plan.source_url;
+  } else {
+    img.hidden = true; dot.hidden = true;
+    document.getElementById("plan-title").innerHTML += "<br/>이 층은 안내도가 없어 건물 위치만 표시합니다.";
+  }
+  // 3D 스캔 버튼 (E8 3층 등): 스플랫 / 점 구름
+  const origin = API.replace(/\/api\/v1$/, "");
+  document.getElementById("plan-3d").innerHTML = (it.scans || []).map(s =>
+    `<button onclick="window.open('${origin}${s.viewer_url}', '_blank')" title="${esc(s.title)}">3D ${esc(s.title.replace(/^\S+층\s*/, ""))}</button>`
+  ).join(" ");
+  card.hidden = false;
+}
+
+document.getElementById("find").onclick = findRoom;
+document.getElementById("q").onkeydown = (e) => { if (e.key === "Enter") findRoom(); };
+document.getElementById("plan-close").onclick = () => { document.getElementById("plan").hidden = true; };
+document.getElementById("plan-route").onclick = async () => {
+  if (!roomSel) return;
+  const b = roomSel.building;
+  try {
+    const r = await api(`/route?from=${GATE[0]},${GATE[1]}&to=${b.lat},${b.lng}&mode=walk`);
+    draw([{ type: "Feature", geometry: r.geometry, properties: { color: COLORS[0], sel: true } }]);
+    addMarker(GATE[0], GATE[1], "#16a34a");
+    map.fitBounds([[Math.min(GATE[1], b.lng) - .001, Math.min(GATE[0], b.lat) - .001],
+                   [Math.max(GATE[1], b.lng) + .001, Math.max(GATE[0], b.lat) + .001]], { padding: 60 });
+    document.getElementById("plan-title").innerHTML =
+      `<b>${esc(roomLabel(roomSel))}</b><br/>정문에서 ${(r.distance_m / 1000).toFixed(2)}km · 걸어서 약 ${fmtMin(r.duration_s)}`;
+  } catch (err) { msg("⚠ " + err.message); }
+};
+
+function setTab(t) {
+  tab = t; from = null; courses = []; clearMarkers(); draw([]);
+  document.getElementById("plan").hidden = true;
+  for (const k of ["route", "run", "room"]) {
+    document.getElementById("tab-" + k).classList.toggle("on", t === k);
+    document.getElementById(k + "-ui").hidden = t !== k;
+  }
+  if (t === "run") { addMarker(runStart[0], runStart[1], "#111"); msg("지도 클릭으로 출발점 변경 (기본: DGIST 정문)"); }
+  else if (t === "room") { msg("강의실 번호나 이름을 검색하세요."); document.getElementById("q").focus(); }
+  else msg("지도에서 출발지를 클릭하세요.");
+}
+document.getElementById("tab-route").onclick = () => setTab("route");
+document.getElementById("tab-run").onclick = () => setTab("run");
+document.getElementById("tab-room").onclick = () => setTab("room");
+document.getElementById("clear").onclick = () => setTab("route");
+document.getElementById("three").onchange = (e) => {
+  const v = e.target.checked ? "visible" : "none";
+  if (map.getLayer("buildings-3d")) map.setLayoutProperty("buildings-3d", "visibility", v);
+  map.easeTo({ pitch: e.target.checked ? 55 : 0, duration: 600 });
+};
+</script>
+<script type="module">
+// ---------- DGIST E 단지 3D: E7 컨실리언스홀 상세 모델 + 나머지 동 높이 보정 ----------
+// OSM에는 E1~E7이 빗 모양 다각형 하나(id 15700286740)로 되어 있어 손으로 나눔.
+// E7 외관 참고: 행림건축 DGIST 학위과정시설 사진 (유리 커튼월 2개 층 + 금속 패널·가로 루버 상부 + 얇은 처마)
+import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+
+const COMPLEX_ID = 15700286740;
+const P = {  // 단지 다각형 꼭짓점 (lng, lat)
+  0: [128.453431, 35.708098], 1: [128.454305, 35.707906], 2: [128.454031, 35.707000], 3: [128.454316, 35.706922],
+  4: [128.454005, 35.705946], 5: [128.454117, 35.705833], 6: [128.453903, 35.705097], 7: [128.453763, 35.705110],
+  8: [128.453704, 35.704896], 9: [128.453929, 35.704827], 10: [128.453768, 35.704422], 11: [128.452588, 35.704713],
+  12: [128.452685, 35.705127], 13: [128.453264, 35.705005], 14: [128.453291, 35.705084], 15: [128.452486, 35.705297],
+  16: [128.452551, 35.705432], 17: [128.452422, 35.705489], 18: [128.452529, 35.705702], 19: [128.453345, 35.705532],
+  20: [128.453409, 35.705702], 21: [128.452604, 35.705890], 22: [128.452669, 35.706033], 23: [128.452765, 35.706012],
+  24: [128.452867, 35.706216], 25: [128.453559, 35.706090], 26: [128.453597, 35.706290], 27: [128.452696, 35.706495],
+  28: [128.452744, 35.706665], 29: [128.452604, 35.706704], 30: [128.452696, 35.706939], 31: [128.453699, 35.706752],
+  32: [128.453758, 35.706904], 33: [128.453055, 35.707074], 34: [128.453109, 35.707236], 35: [128.452964, 35.707279],
+  36: [128.453087, 35.707523], 37: [128.453940, 35.707340], 38: [128.454005, 35.707510], 39: [128.453173, 35.707689],
+  cap: [128.454185, 35.707510],  // 북쪽 동과 E7 경계가 동쪽 외곽선과 만나는 점
+};
+const ring = (ids) => { const r = ids.map(i => P[i]); r.push(r[0]); return r; };
+const BLOCKS = [  // [이름, 꼭짓점, 높이 m] — 층수: E1 10층, 날개 동 7층 (행림건축 자료·사진 기준 추정)
+  ["E1", [8, 9, 10, 11, 12, 13], 42],
+  ["E2", [14, 15, 16, 17, 18, 19], 30],
+  ["E3", [20, 21, 22, 23, 24, 25], 30],
+  ["E4", [26, 27, 28, 29, 30, 31], 30],
+  ["E5", [32, 33, 34, 35, 36, 37], 30],
+  ["E6", [38, 39, 0, 1, "cap"], 30],
+];
+const E7_RING = [14, 19, 20, 25, 26, 31, 32, 37, 38, "cap", 2, 3, 4, 5, 6, 7, 8, 13];
+const E7_H = { glass: 10, top: 16.5 };  // G·L층 유리 + 2층 금속 패널
+
+// 모듈 스크립트는 늦게 실행되므로 지도가 이미 로드됐을 수 있음
+const whenReady = (fn) => (map.isStyleLoaded() && map.getLayer("buildings-3d") ? fn() : setTimeout(() => whenReady(fn), 200));
+whenReady(() => {
+  // 1) 단지 통째 extrusion에서 E 단지를 빼고, 나눈 동들을 실제 높이로
+  // 배경 스타일 자체 3D 레이어(building-3d)와 우리 토글 레이어(buildings-3d) 둘 다에서 제외.
+  // 스타일 로딩 타이밍에 따라 한 번 설정이 빠질 수 있어 idle 때마다 확인 (레거시 필터 문법: ["id"] 식은 여기서 안 먹음)
+  const EXCLUDE = ["all", ["!has", "hide_3d"], ["!=", "$id", COMPLEX_ID]];
+  const applyFilters = () => {
+    for (const id of ["building-3d", "buildings-3d"])
+      if (map.getLayer(id) && JSON.stringify(map.getFilter(id)) !== JSON.stringify(EXCLUDE)) map.setFilter(id, EXCLUDE);
+  };
+  applyFilters();
+  map.on("idle", applyFilters);
+  map.on("styledata", applyFilters);
+  const t = setInterval(applyFilters, 500); setTimeout(() => clearInterval(t), 15000);
+  map.addSource("dgist-blocks", { type: "geojson", data: { type: "FeatureCollection", features:
+    BLOCKS.map(([name, ids, h]) => ({ type: "Feature", properties: { name, h }, geometry: { type: "Polygon", coordinates: [ring(ids)] } })) } });
+  map.addLayer({ id: "dgist-blocks-3d", type: "fill-extrusion", source: "dgist-blocks", minzoom: 14,
+    paint: { "fill-extrusion-color": "#e4e6e8", "fill-extrusion-height": ["get", "h"], "fill-extrusion-opacity": 1 } });
+
+  // 2) E7 상세 모델 (three.js 커스텀 레이어)
+  map.addLayer(makeE7Layer());  // 배경 3D 건물처럼 항상 표시
+});
+
+function makeE7Layer() {
+  const pts = E7_RING.map(i => P[i]);
+  const lng0 = pts.reduce((s, p) => s + p[0], 0) / pts.length, lat0 = pts.reduce((s, p) => s + p[1], 0) / pts.length;
+  const origin = maplibregl.MercatorCoordinate.fromLngLat([lng0, lat0], 0);
+  const scale = origin.meterInMercatorCoordinateUnits();
+  const mPerLng = 111320 * Math.cos(lat0 * Math.PI / 180), mPerLat = 110540;
+  // 지역 좌표(m): x=동쪽, y=북쪽 → three.js에서는 x=동, y=위, z=남(-북)
+  const xy = pts.map(([lng, lat]) => [(lng - lng0) * mPerLng, (lat - lat0) * mPerLat]);
+
+  const group = new THREE.Group();
+  const shape = new THREE.Shape(xy.map(([x, y]) => new THREE.Vector2(x, y)));
+  const extrude = (depth, mat, z0) => {
+    const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false });
+    g.rotateX(-Math.PI / 2); g.translate(0, z0, 0);  // Shape(x,y) → 바닥(x,-z), 높이 y
+    return new THREE.Mesh(g, mat);
+  };
+  const glass = new THREE.MeshStandardMaterial({ color: 0x3d5b5a, metalness: 0.7, roughness: 0.12, transparent: true, opacity: 0.92 });
+  const panel = new THREE.MeshStandardMaterial({ color: 0xb9bec4, metalness: 0.5, roughness: 0.4 });
+  const louver = new THREE.MeshStandardMaterial({ color: 0x3a3f45, metalness: 0.3, roughness: 0.55 });
+  const slab = new THREE.MeshStandardMaterial({ color: 0xe9ebed, metalness: 0.2, roughness: 0.6 });
+  const mullion = new THREE.MeshStandardMaterial({ color: 0x2a2f33, metalness: 0.6, roughness: 0.4 });
+
+  group.add(extrude(E7_H.glass, glass, 0));                       // G·L층 유리 덩어리
+  group.add(extrude(E7_H.top - E7_H.glass, panel, E7_H.glass));    // 2층 금속 패널
+  group.add(extrude(0.6, slab, E7_H.top));                         // 지붕
+
+  // 외곽선 따라 붙이는 부재: 층 슬래브 띠, 루버, 멀리언, 처마
+  const along = (a, b, h, y, depth, out, mat) => {
+    const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
+    const nx = dy / len, ny = -dx / len;  // 바깥쪽 법선 (시계 방향 다각형 기준; 아래에서 방향 보정)
+    const m = new THREE.Mesh(new THREE.BoxGeometry(len + depth, h, depth), mat);
+    m.position.set((a[0] + b[0]) / 2 + nx * out * orient, y, -((a[1] + b[1]) / 2 + ny * out * orient));
+    m.rotation.y = Math.atan2(dy, dx);
+    return m;
+  };
+  // 다각형 방향에 따라 바깥 법선 부호 결정
+  const area = xy.reduce((s, p, i) => { const q = xy[(i + 1) % xy.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0);
+  const orient = area > 0 ? 1 : -1;  // 반시계(+)면 (dy,-dx)가 바깥쪽
+
+  for (let i = 0; i < xy.length; i++) {
+    const a = xy[i], b = xy[(i + 1) % xy.length];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    for (const y of [0.3, 5, E7_H.glass]) group.add(along(a, b, 0.5, y, 0.5, 0.25, slab));      // 층 슬래브 띠
+    for (let y = E7_H.glass + 1; y < E7_H.top - 0.5; y += 0.8) group.add(along(a, b, 0.35, y, 0.5, 0.25, louver)); // 가로 루버
+    group.add(along(a, b, 0.5, E7_H.top + 0.3, 1.4, 0.6, slab));                                // 처마
+    // 유리 커튼월 세로 멀리언 (약 3m 간격)
+    const n = Math.max(1, Math.round(len / 3));
+    for (let k = 1; k < n; k++) {
+      const t = k / n, px = a[0] + (b[0] - a[0]) * t, py = a[1] + (b[1] - a[1]) * t;
+      const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+      const nx = (b[1] - a[1]) / len * orient, ny = -(b[0] - a[0]) / len * orient;
+      const m = new THREE.Mesh(new THREE.BoxGeometry(0.18, E7_H.glass, 0.3), mullion);
+      m.position.set(px + nx * 0.1, E7_H.glass / 2, -(py + ny * 0.1)); m.rotation.y = ang;
+      group.add(m);
+    }
+  }
+
+  // "E7" 사인 (남쪽 끝 상부, 사진 기준)
+  const cv = document.createElement("canvas"); cv.width = 256; cv.height = 128;
+  const cx = cv.getContext("2d"); cx.fillStyle = "#2a2f33"; cx.font = "bold 96px sans-serif"; cx.textAlign = "center"; cx.textBaseline = "middle";
+  cx.fillText("E7", 128, 70);
+  const sign = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), transparent: true }));
+  const s = xy[E7_RING.indexOf(13)];  // 남서쪽 모서리 부근
+  sign.position.set(s[0] + 6, E7_H.top + 3, -(s[1] + 4)); sign.scale.set(8, 4, 1);
+  group.add(sign);
+
+  let renderer, scene, camera;
+  return {
+    id: "e7-model", type: "custom", renderingMode: "3d",
+    onAdd(m, gl) {
+      camera = new THREE.Camera(); scene = new THREE.Scene();
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f94, 1.6));
+      const sun = new THREE.DirectionalLight(0xffffff, 1.8); sun.position.set(-60, 120, 80); scene.add(sun);
+      scene.add(group);
+      renderer = new THREE.WebGLRenderer({ canvas: m.getCanvas(), context: gl, antialias: true });
+      renderer.autoClear = false;
+    },
+    render(gl, args) {
+      const matrix = args.defaultProjectionData ? args.defaultProjectionData.mainMatrix : args;
+      const l = new THREE.Matrix4()
+        .makeTranslation(origin.x, origin.y, origin.z)
+        .scale(new THREE.Vector3(scale, -scale, scale))
+        .multiply(new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2));
+      camera.projectionMatrix = new THREE.Matrix4().fromArray(matrix).multiply(l);
+      renderer.resetState(); renderer.render(scene, camera);  // 정적 모델이라 매 프레임 repaint 요청 안 함
+    },
+  };
+}
+</script>
+</body>
+</html>

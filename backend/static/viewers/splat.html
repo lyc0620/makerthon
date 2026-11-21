@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>3D 실내 스플랫</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; color: #eee; font-family: system-ui, sans-serif; overflow: hidden; }
+  #info {
+    position: absolute; top: 12px; left: 12px; right: 12px; max-width: 420px; z-index: 10;
+    background: rgba(0,0,0,.6); padding: 10px 12px; border-radius: 10px; font-size: 13px; line-height: 1.5;
+  }
+  #info b { font-size: 15px; }
+  #info a { color: #9cf; }
+  #info button {
+    margin-top: 6px; padding: 5px 10px; border-radius: 6px; border: 1px solid #666; background: #222; color: #eee; cursor: pointer;
+  }
+  #info button.on { background: #2563eb; border-color: #2563eb; }
+  /* 휴대폰·마우스용 이동 버튼 (누르고 있으면 계속 이동) */
+  #pad { position: absolute; right: 16px; bottom: 16px; z-index: 10; display: grid; gap: 6px;
+         grid-template-columns: repeat(3, 52px); grid-template-rows: repeat(3, 52px); user-select: none; }
+  #pad button { border-radius: 10px; border: 1px solid #555; background: rgba(0,0,0,.55); color: #eee; font-size: 20px;
+                touch-action: none; cursor: pointer; }
+  #pad button:active { background: #2563eb; }
+  #pad[hidden] { display: none; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "@mkkellogg/gaussian-splats-3d": "https://unpkg.com/@mkkellogg/gaussian-splats-3d@0.4.7/build/gaussian-splats-3d.module.js"
+} }
+</script>
+</head>
+<body>
+<div id="info">
+  <b id="title">3D 스플랫</b><br />
+  <span id="status">불러오는 중...</span><br />
+  <span id="help"></span> · <a href="/">← 지도로</a><br />
+  <button id="mode" class="on">🚶 걷기 모드</button>
+</div>
+<div id="pad">
+  <button data-k="up" title="위로 (E)" style="grid-column:1;grid-row:1">⤒</button>
+  <button data-k="fwd" title="앞으로 (W)" style="grid-column:2;grid-row:1">▲</button>
+  <button data-k="down" title="아래로 (Q)" style="grid-column:3;grid-row:1">⤓</button>
+  <button data-k="left" title="왼쪽 (A)" style="grid-column:1;grid-row:2">◀</button>
+  <button data-k="back" title="뒤로 (S)" style="grid-column:2;grid-row:2">▼</button>
+  <button data-k="right" title="오른쪽 (D)" style="grid-column:3;grid-row:2">▶</button>
+</div>
+<script type="module">
+import * as GS from "@mkkellogg/gaussian-splats-3d";
+
+// ?scan=e8_3f_gs → /api/v1/scans/files/e8_3f_gs.ply (+ .json: up, center)
+const scan = new URLSearchParams(location.search).get("scan") || "e8_3f_gs";
+const base = location.protocol.startsWith("http") ? "" : "http://localhost:8000";
+const status = (t) => { document.getElementById("status").textContent = t; };
+
+let meta = { up: [0, -1, 0], center: [0, 0, 0] };
+try {
+  const r = await fetch(`${base}/api/v1/scans/files/${scan}.json`, { cache: "no-store" });
+  if (r.ok) meta = { ...meta, ...(await r.json()) };
+} catch {}
+if (meta.title) document.getElementById("title").textContent = meta.title;
+
+const [cx, cy, cz] = meta.center, [ux, uy, uz] = meta.up;
+// 학습 때 저장한 실제 촬영 위치에서 시작 (없으면 중심 근처)
+const startPos = meta.start_position || [cx + ux * 1.5 + 2, cy + uy * 1.5, cz + uz * 1.5 + 2];
+const startLook = meta.start_look_at || [cx, cy, cz];
+const viewer = new GS.Viewer({
+  cameraUp: [ux, uy, uz],
+  initialCameraLookAt: startLook,
+  initialCameraPosition: startPos,
+  sharedMemoryForWorkers: false, // COOP/COEP 헤더 없이도 동작
+  dynamicScene: false,
+});
+// meta.format === "splat" 이면 경량 .splat (ply_to_splat.py 변환본), 아니면 원본 .ply
+const isSplat = meta.format === "splat";
+viewer.addSplatScene(`${base}/api/v1/scans/files/${scan}.${isSplat ? "splat" : "ply"}`, {
+  format: isSplat ? GS.SceneFormat.Splat : GS.SceneFormat.Ply,
+  showLoadingUI: true,
+  progressiveLoad: true,
+  splatAlphaRemovalThreshold: 5,
+}).then(() => {
+  viewer.start();
+  status(`가우시안 ${meta.splats ? meta.splats.toLocaleString() + "개" : ""} · 영상에서 학습 (3D Gaussian Splatting)`);
+  setupWalk();
+}).catch((e) => status("⚠ 불러오지 못했습니다: " + e.message));
+
+// ---------- 걷기 모드: WASD/방향키로 이동, 드래그로 그 자리에서 둘러보기 ----------
+// OrbitControls의 회전 중심(target)을 카메라 바로 앞(0.05)에 두면 드래그가 '고개 돌리기'처럼 동작하고,
+// 이동할 때 카메라와 target을 같이 옮긴다. 둘러보기 모드에서는 원래처럼 한 점 중심 회전 + 휠 확대.
+function setupWalk() {
+  const cam = viewer.camera, ctr = viewer.controls;
+  if (!cam || !ctr) return;
+  const THREE = cam.position.constructor;  // three.js Vector3 클래스 재사용
+  const up = new THREE(ux, uy, uz).normalize();
+  const span = Math.hypot(...startPos.map((v, i) => v - [cx, cy, cz][i])) || 3;
+  const baseSpeed = Math.max(0.6, span * 0.35);  // 장면 크기에 맞춘 이동 속도 (단위/초)
+  const keys = new Set();
+  let walk = true;
+
+  const KEYMAP = { KeyW: "fwd", ArrowUp: "fwd", KeyS: "back", ArrowDown: "back", KeyA: "left", ArrowLeft: "left",
+                   KeyD: "right", ArrowRight: "right", KeyE: "up", PageUp: "up", KeyQ: "down", PageDown: "down" };
+  addEventListener("keydown", (e) => { const k = KEYMAP[e.code]; if (k) { keys.add(k); e.preventDefault(); } if (e.shiftKey) keys.add("fast"); });
+  addEventListener("keyup", (e) => { const k = KEYMAP[e.code]; if (k) keys.delete(k); if (!e.shiftKey) keys.delete("fast"); });
+  addEventListener("blur", () => keys.clear());
+  for (const b of document.querySelectorAll("#pad button")) {
+    const k = b.dataset.k;
+    b.addEventListener("pointerdown", (e) => { keys.add(k); b.setPointerCapture(e.pointerId); });
+    for (const ev of ["pointerup", "pointercancel", "pointerleave"]) b.addEventListener(ev, () => keys.delete(k));
+  }
+
+  const forward = () => new THREE().subVectors(ctr.target, cam.position).normalize();
+  const setMode = (w) => {
+    walk = w;
+    const f = forward(), dist = w ? 0.05 : span * 0.6;
+    ctr.target.copy(cam.position).addScaledVector(f, dist);
+    ctr.enableZoom = !w;                  // 걷기 모드에선 휠을 앞뒤 이동으로 씀
+    ctr.rotateSpeed = w ? 0.35 : 1.0;
+    ctr.update();
+    const btn = document.getElementById("mode");
+    btn.textContent = w ? "🚶 걷기 모드" : "🔄 둘러보기 모드"; btn.classList.toggle("on", w);
+    document.getElementById("help").textContent = w
+      ? "W A S D·방향키: 이동 · Q/E: 아래/위 · Shift: 빠르게 · 드래그: 둘러보기 · 휠: 앞뒤"
+      : "드래그: 회전 · 휠: 확대 · 오른쪽 드래그: 이동";
+  };
+  document.getElementById("mode").onclick = () => setMode(!walk);
+  // 둘러보기 모드에서는 이동 버튼 숨김
+  const padToggle = () => { document.getElementById("pad").hidden = !walk; };
+  document.getElementById("mode").addEventListener("click", padToggle);
+
+  // 걷기 모드 휠: 앞뒤 이동
+  renderer().domElement.addEventListener("wheel", (e) => {
+    if (!walk) return;
+    e.preventDefault();
+    move(forwardFlat(), -Math.sign(e.deltaY) * baseSpeed * 0.15);
+  }, { passive: false });
+
+  function renderer() { return viewer.renderer; }
+  function forwardFlat() {  // 높이는 유지하고 바닥과 나란히 앞으로
+    const f = forward(); f.addScaledVector(up, -f.dot(up));
+    return f.lengthSq() > 1e-6 ? f.normalize() : forward();
+  }
+  function move(dir, amount) {
+    cam.position.addScaledVector(dir, amount);
+    ctr.target.addScaledVector(dir, amount);
+  }
+
+  let last = performance.now();
+  (function tick(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (walk && keys.size) {
+      const step = baseSpeed * (keys.has("fast") ? 3 : 1) * dt;
+      const f = forwardFlat(), r = new THREE().crossVectors(f, up).normalize();
+      if (keys.has("fwd")) move(f, step);
+      if (keys.has("back")) move(f, -step);
+      if (keys.has("right")) move(r, step);
+      if (keys.has("left")) move(r, -step);
+      if (keys.has("up")) move(up, step);
+      if (keys.has("down")) move(up, -step);
+    }
+    requestAnimationFrame(tick);
+  })(last);
+
+  setMode(true);
+}
+</script>
+</body>
+</html>
