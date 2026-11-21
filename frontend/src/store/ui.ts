@@ -8,7 +8,7 @@ export type SelectedItem =
   | { type: 'report'; id: string }
   | null
 
-export type LayerKey = 'bus' | 'seminar' | 'restaurant' | 'route' | 'report'
+export type LayerKey = 'bus' | 'seminar' | 'restaurant' | 'route' | 'report' | 'buildings3d'
 export type Tab = 'map' | 'seminars' | 'bus'
 
 type UiState = {
@@ -46,7 +46,14 @@ const safeStorage = createJSONStorage(() => {
 export const useUi = create<UiState>()(
   persist(
     (set) => ({
-      layers: { bus: true, seminar: true, restaurant: true, route: true, report: false },
+      layers: {
+        bus: true,
+        seminar: true,
+        restaurant: true,
+        route: true,
+        report: false,
+        buildings3d: false,
+      },
       toggleLayer: (key) => set((s) => ({ layers: { ...s.layers, [key]: !s.layers[key] } })),
 
       selected: null,

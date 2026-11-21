@@ -2,10 +2,28 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 
 import { setWorkerUrl } from 'maplibre-gl'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import type { ReactNode } from 'react'
+import type { StyleSpecification } from 'maplibre-gl'
+import { type ReactNode, useEffect, useState } from 'react'
 import { GeolocateControl, Map, NavigationControl } from 'react-map-gl/maplibre'
 
 import { useUi } from '../store/ui'
+import Map3DSync from './Map3DSync'
+import { loadStylizedStyle, PALETTE, VIEW_BOUNDS } from './stylize'
+
+/** 배경 스타일을 받아 미니어처 색으로 바꾼다. 실패하면 원래 스타일 URL 을 그대로 쓴다. */
+function useStylizedStyle(url: string): StyleSpecification | string | null {
+  const [style, setStyle] = useState<StyleSpecification | string | null>(null)
+  useEffect(() => {
+    let alive = true
+    loadStylizedStyle(url)
+      .then((s) => alive && setStyle(s))
+      .catch(() => alive && setStyle(url))
+    return () => {
+      alive = false
+    }
+  }, [url])
+  return style
+}
 
 // 비어 있으면 OpenFreeMap(키 불필요, OSM 기반). MapTiler·브이월드로 바꿀 땐 .env 만 수정
 const STYLE_URL =
@@ -22,21 +40,46 @@ type Props = { children?: ReactNode }
 /** 앱 전체에 지도는 이것 하나. 기능별 레이어는 children 으로 끼운다. */
 export default function MapView({ children }: Props) {
   const select = useUi((s) => s.select)
+  const is3d = useUi((s) => !!s.layers.buildings3d)
+  const mapStyle = useStylizedStyle(STYLE_URL)
+
+  if (!mapStyle) return <div className="absolute inset-0" style={{ background: PALETTE.ground }} />
 
   return (
     <Map
+      mapStyle={mapStyle}
       initialViewState={{
         latitude: CAMPUS_CENTER.lat,
         longitude: CAMPUS_CENTER.lng,
         zoom: 14.6,
       }}
-      mapStyle={STYLE_URL}
       style={{ position: 'absolute', inset: 0 }}
       attributionControl={{ compact: true }}
+      maxPitch={75} // 많이 기울이면 뒤쪽 산과 하늘이 보인다
+      maxBounds={VIEW_BOUNDS} // 캠퍼스·현풍읍·유가읍·주변 산지 밖으로는 이동하지 않는다
+      minZoom={12} // 원형 지역 전체가 한 화면에 들어오는 정도까지
+      onLoad={(e) => {
+        // 개발 중 콘솔에서 시점을 조정해 볼 수 있게 (window.__map.jumpTo({ pitch: 60 }))
+        if (import.meta.env.DEV) (window as unknown as { __map: unknown }).__map = e.target
+      }}
       onClick={() => select(null)} // 빈 곳을 누르면 바텀시트 닫기 (마커는 이벤트 전파를 막는다)
     >
-      <NavigationControl position="top-right" showCompass={false} style={{ marginTop: 64 }} />
-      <GeolocateControl position="top-right" trackUserLocation showAccuracyCircle />
+      {/* 3D 에서는 회전·기울기가 생기므로 나침반(누르면 북쪽·수평으로 복귀)을 보여 준다 */}
+      <NavigationControl
+        key={is3d ? 'nav-3d' : 'nav-2d'} // 컨트롤은 생성 시 옵션만 읽으므로 모드가 바뀌면 새로 만든다
+        position="top-right"
+        showCompass={is3d}
+        visualizePitch
+        style={{ marginTop: 64 }}
+      />
+      {/* 줌 버튼과 함께 다시 만들어 순서(줌 → 내 위치)가 바뀌지 않게 */}
+      <GeolocateControl
+        key={is3d ? 'geo-3d' : 'geo-2d'}
+        position="top-right"
+        trackUserLocation
+        showAccuracyCircle
+      />
+      <Map3DSync enabled3d={is3d} />
       {children}
     </Map>
   )

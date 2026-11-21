@@ -1,6 +1,7 @@
 import BottomSheet from './components/BottomSheet'
 import LayerToggle from './components/LayerToggle'
 import TabBar from './components/TabBar'
+import CampusBuildingsLayer from './layers/CampusBuildingsLayer'
 import BusLayer from './layers/BusLayer'
 import SeminarLayer from './layers/SeminarLayer'
 import MapView from './map/MapView'
@@ -17,6 +18,8 @@ export default function App() {
       <main className="relative flex-1 overflow-hidden">
         {/* 지도는 탭을 바꿔도 언마운트하지 않는다 (위치·줌 유지) */}
         <MapView>
+          {/* 캠퍼스 건물 박스 (항상). 3D 토글은 기울기·지형만 바꾼다 */}
+          <CampusBuildingsLayer visible />
           <BusLayer visible={layers.bus} />
           <SeminarLayer visible={layers.seminar} />
           {/* 팀원 레이어: <RestaurantLayer visible={layers.restaurant} /> ... */}

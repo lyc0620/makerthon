@@ -4,6 +4,7 @@ import { type LayerKey, useUi } from '../store/ui'
 const ITEMS: { key: LayerKey; label: string; icon: string }[] = [
   { key: 'bus', label: '버스', icon: '🚌' },
   { key: 'seminar', label: '세미나', icon: '🎤' },
+  { key: 'buildings3d', label: '3D', icon: '🏢' },
 ]
 
 export default function LayerToggle() {
@@ -13,7 +14,7 @@ export default function LayerToggle() {
   return (
     <div className="pointer-events-auto flex gap-2 overflow-x-auto px-4 py-3">
       {ITEMS.map(({ key, label, icon }) => {
-        const on = layers[key]
+        const on = !!layers[key]
         return (
           <button
             key={key}

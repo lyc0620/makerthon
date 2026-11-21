@@ -1,8 +1,146 @@
-# 현풍 지도 프로젝트 — 작업 인수인계 v2 (크롤링·통합 담당)
+# 현풍 지도 프로젝트 — 작업 인수인계 v3 (크롤링·통합·3D 담당)
 
-> 이 문서는 Claude Code에서 프로젝트를 이어가기 위한 컨텍스트입니다.
-> 나는 이 팀 프로젝트에서 **세미나 수집 + 버스 도착정보 수집 + 최종 통합(백엔드 정리 + 프론트엔드)**을 맡았습니다.
+> 이 문서는 Claude Code에서 프로젝트를 이어가기 위한 컨텍스트입니다. **이 파일 하나만 읽으면 이어서 작업할 수 있게** 썼습니다.
+> 나(lyc0620)는 이 팀 프로젝트에서 **세미나 수집 + 버스 도착정보 수집 + 최종 통합(백엔드 정리 + 프론트엔드) + 3D 지도**를 맡았습니다.
 > **5~7장의 기술 스택과 API 규격은 확정안**입니다. 이 문서와 다르게 구현해야 할 이유가 생기면 코드보다 문서를 먼저 고칩니다.
+> 읽는 순서: **00장(현재 상태·다음 할 일) → 0장(결정 변경 이력) → 1~9장(원래 규격)**.
+
+---
+
+## 00. 다음 Claude 세션에게 — 현재 상태 (v3, 2026-11-21 기준)
+
+### 00.1 위치와 git 상태
+- 작업 폴더: `C:\Users\PC\Desktop\DGIST\26-2\.etc\makerthon\`
+  - `github/` ← **저장소** (remote `https://github.com/lyc0620/makerthon`). 4장의 `hyeonpung-map/` 루트가 곧 이 폴더다.
+  - `hyeonpung-map-handoff.md` (이 문서의 복사본), `db-integration.md`, `api-spec-db.md` (DB 담당이 준 문서), `.claude/launch.json` (미리보기 서버 설정)
+  - 상위 `makerthon/` 폴더에도 커밋 없는 빈 `.git` 이 하나 있다(사용자가 만든 것, 무시해도 됨).
+- 현재 브랜치: **`feat/integration-bus-seminar`**
+  - 푸시된 커밋: `e3f1af4 feat: monorepo skeleton with live bus arrivals and portal seminar crawler` (`origin/feat/integration-bus-seminar`)
+  - `main` 은 `69fcd58 first commit`(README 한 줄)뿐. PR 은 아직 안 만듦.
+- **커밋 안 된 작업 (3D 지도, 사용자 확인 완료, 커밋·푸시 필요)**:
+  - 수정: `docs/handoff.md`(이 문서 v3), `frontend/src/App.tsx`, `frontend/src/components/LayerToggle.tsx`, `frontend/src/map/MapView.tsx`, `frontend/src/store/ui.ts`
+  - 새 파일: `backend/scripts/build_campus_buildings.py`, `frontend/public/data/campus-buildings.geojson`, `frontend/src/layers/CampusBuildingsLayer.tsx`, `frontend/src/map/Map3DSync.tsx`, `frontend/src/map/stylize.ts`
+  - 커밋할 때 `frontend/src/index.css`, `main.tsx` 가 수정으로 잡히면 Prettier 가 줄바꿈만 바꾼 것이라 `git checkout -- frontend/src/index.css frontend/src/main.tsx` 로 되돌린다.
+- 원격의 팀원 브랜치 (아직 **합치지 않음** — 사용자가 "나중에 통합할 때 문제 생길 수 있으니 미루자"고 결정, 한 번 합쳤다가 롤백함):
+  - `origin/feat/db-part` (bamfiring: 맛집·경찰 제보·밥친구) — 00.7 참고
+  - `origin/feat/dohyeon-route` (김도현: 길찾기·러닝·3D 건물 레이어) — 00.7 참고
+
+### 00.2 실행 방법 (Windows)
+- 필요: Python 3.13(설치됨), Node 24 / npm 11(설치됨), **uv** — `python -m pip install --user uv` 로 설치했다.
+  - Claude 의 Bash 에서는 `python -m uv ...` 가 되지만, **사용자 PowerShell 에서는 `python -m uv` 가 "No module named uv"** 로 실패했다. 사용자 터미널에서는 `backend\.venv\Scripts\python.exe` 를 직접 쓴다.
+- 미리보기 서버(Claude 데스크톱 브라우저 패널): `makerthon/.claude/launch.json` 에 `backend`(8000), `frontend`(5173) 가 있다 → `preview_start` 로 이름으로 띄운다.
+- 직접 실행:
+  ```
+  cd github/backend && python -m uv sync && python -m uv run uvicorn app.main:app --port 8000
+  cd github/frontend && npm install && npm run dev      # /api 는 8000 으로 프록시
+  ```
+- 테스트·린트: `cd backend && python -m uv run pytest -q && python -m uv run ruff check . && python -m uv run ruff format .` (현재 **83개 통과**), `cd frontend && npx prettier --write src && npm run lint && npm run build` (통과)
+- **로컬 비밀값 (커밋 금지, .gitignore 됨)**
+  - `backend/.env`: `BUS_SOURCE=crawl`, `SEMINAR_SOURCE=portal`, `ADMIN_TOKEN=<랜덤 생성값>`, `CORS_ORIGINS=http://localhost:5173`
+  - `backend/data/portal_cookies.json`: **사용자 개인 포탈 로그인 세션 쿠키** (12개). 외부로 보내거나 출력하지 말 것.
+  - `backend/data/app.db*`: 로컬 SQLite (세미나 33건 수집돼 있음)
+- 개발 중 브라우저 콘솔에서 `window.__map` 으로 지도 객체에 접근 가능 (`MapView` 의 `onLoad`, DEV 빌드에서만). 시점 확인용: `window.__map.jumpTo({ center:[128.4545,35.7052], zoom:16.6, pitch:58, bearing:-35 })`
+
+### 00.3 사용자에 대해 / 일하는 방식
+- 한국어로 대화. 결과를 브라우저 패널에서 직접 눌러 보며 피드백을 준다(작업 중에 패널을 같이 조작하기도 함 → 시점이 덮어써질 수 있음).
+- 커밋·푸시는 사용자가 요청할 때만. 브랜치 이름은 `feat/<이름>-<기능>` 규칙.
+- 결정을 맡기면("너가 생각하는 가장 좋은 방식") 추천안으로 진행하고 이유를 짧게 알린다.
+- 학교가 크롤링 사전 허가(공문, 2026-11-21)를 받아 둠 → 학교 사이트·공공 사이트 크롤링은 OK. **네이버·카카오·구글 지도/스트리트뷰는 크롤링·이미지 사용 금지** (약관·저작권). 사용자가 구글 스트리트뷰 이미지 사용을 제안했을 때 거절하고 데이터로 그리는 방식으로 대체했다.
+- 팀에 Blender 쓸 줄 아는 사람이 없다 → 3D 는 코드로(OSM 윤곽 + 층수 표) 만든다.
+
+### 00.4 지금까지 구현된 것 (요약 — 자세한 건 0장과 코드 주석)
+**백엔드 (`github/backend`, FastAPI + SQLModel + SQLite WAL + Alembic + APScheduler)**
+- 공통: `app/core/config.py`(Settings, 소문자 필드, `.env` 는 `backend/.env`), `db.py`(`TZDateTime`: UTC 저장·KST 반환), `errors.py`(`ApiError(status, message)` → `{"error":{code,message}}`), `time.py`(`KST`, `now_kst`)
+- 라우터(`/api/v1`): `health`, `buildings`, `bus`(stops, arrivals), `seminars`(목록·상세), `admin`(portal-cookies PUT, crawl-status GET, seminar-crawl POST — 헤더 `X-Admin-Token`, `ADMIN_TOKEN` 없으면 403)
+- 시작 시(`app/main.py` lifespan): Alembic upgrade → seed 반영(`seed/buildings.json`, `bus_stops.json`; 정류장은 seed 에 없는 것 삭제) → **저장된 세미나 장소 재매핑(`remap_places`)** → 버스 즉시 1회 수집 → 세미나 백그라운드 1회 수집 → 스케줄러 시작
+- 스케줄(`app/scheduler.py`): 버스 30초, 세미나 07~23시 10분마다 변경 감지(목록 1페이지, 새 글만 상세), 매일 05시 최근 3페이지 전체 재확인. 세미나 작업은 `asyncio.Lock` 으로 겹치지 않게.
+- 버스(`app/services/bus/`): `crawl.py`(대구 버스정보시스템 `realtime/arr2`), `mock.py`, `shuttle.py`(시간표 계산 — `seed/shuttle_timetable.json` 은 현재 비어 있음), `service.py`(메모리 캐시, `is_stale` 3분)
+- 세미나(`app/services/seminar/`): `portal.py`(학생포탈 크롤러), `cookies.py`(쿠키 보관·형식 검사), `dates.py`(일시·장소 추출), `mapping.py`(장소 → 건물), `pipeline.py`(수집·upsert·만료 대기·재매핑), `mock.py`
+- 도구: `app/tools/upload_cookies.py`(쿠키 업로드 CLI), `scripts/build_campus_buildings.py`(캠퍼스 3D 건물 데이터 생성)
+- 테스트: `tests/` 83개 (`conftest.py` 가 개발자 `.env` 값과 섞이지 않게 환경변수를 덮어쓴다)
+
+**프론트 (`github/frontend`, React 19 + Vite 8 + TS + MapLibre 6 + react-map-gl 8 + TanStack Query + Zustand + Tailwind 4)**
+- `src/map/MapView.tsx`: 지도 하나. 미니어처 스타일 적용(`useStylizedStyle`), `maxBounds`·`minZoom 12`·`maxPitch 75`, 줌/나침반/내 위치 컨트롤, `Map3DSync`
+- `src/map/stylize.ts`: 배경 스타일 변환 (00.5)
+- `src/map/Map3DSync.tsx`: 3D 토글 시 기울기(50°)와 지형(DEM) 켜기/끄기
+- `src/layers/`: `BusLayer`, `SeminarLayer`(건물별로 묶은 핀), `CampusBuildingsLayer`(캠퍼스 3D)
+- `src/sheets/`(BusStopSheet, SeminarSheet), `src/tabs/`(SeminarListTab, BusFavoritesTab), `src/components/`(BottomSheet, LayerToggle(버스·세미나·3D), TabBar, ArrivalList, QueryState)
+- `src/store/ui.ts`: 레이어 on/off(`buildings3d` 포함), 선택 항목, 탭, 버스 즐겨찾기(localStorage, `hyeonpung-map-ui`)
+- `src/api/`: `client.ts`(에러 형식 처리), `types.ts`(6장 타입), `hooks/`
+
+### 00.5 3D 지도 — 사용자와 정한 디자인 (이번 세션의 마지막 작업)
+목표: hanokhana.com(하나고 은평한옥마을 프로젝트) 같은 **low-poly 미니어처(디오라마) 느낌**. 단, 그 사이트는 손으로 만든 glTF 한 장면이고 우리는 실제 지도라서 **지도 스타일을 바꾸는 방식**으로 구현했다.
+1. **지역 한정 (원형)**: 중심 `(128.4575, 35.700)`, 반지름 **3.6km** 원 안만 보인다 (캠퍼스 + 현풍읍 + 유가읍/테크노폴리스 + 주변 산지). 원 밖은 회색 가림막, 가장자리 **1.3km 를 16단계 고리로 점점 흐리게(제곱 곡선, "크레센도")**. 화면 이동(`VIEW_BOUNDS`)과 벡터·고도 타일 요청(`SOURCE_BOUNDS`)도 원을 감싸는 사각형으로 제한 → 리소스 절약. 상수는 `stylize.ts` 맨 위 `REGION_CENTER`, `REGION_RADIUS_KM`, `FADE_KM`, `FADE_STEPS`.
+   - 주의: 다각형 구멍은 **시계 방향**이어야 MapLibre 가 구멍으로 인식한다 (`holeOf`). 반대로 하면 가림막이 안 보인다(실제로 겪음).
+2. **건물**: **캠퍼스 건물만 3D**. 배경 지도의 건물 레이어(평면·3D)는 모두 제거하고, 캠퍼스 밖 건물은 **위에서 본 윤곽(연한 면 + 테두리선, z14 부터)** 으로만 그린다 (`building-footprint*`). 아파트도 윤곽만.
+   - 캠퍼스 건물 데이터: `scripts/build_campus_buildings.py` 가 Overpass(OSM)에서 받아 `frontend/public/data/campus-buildings.geojson` 생성. 중심점이 `CAMPUS_AREA = (35.7000, 128.4485, 35.7100, 128.4600)` 안인 건물만 → **9동** (강의동(E1~E7 이 OSM 에서 한 덩어리, 6층), E8 학술정보관(6층), R2, R3, R4(OSM 이름이 층수 칸에 잘못 들어가 있어 보정), 연구행정동, 창업지원센터, 이름 없는 2동).
+   - **동쪽 원형 공원 건너편 생활관(dormitory) 7동은 사용자 확인으로 캠퍼스 밖 → 제외**.
+   - 층수: OSM 값 → 없으면 `LEVELS` 표 → 없으면 추정(연구동 4, 상업 2). 높이 = 층수 × 3.6m. **대부분 추정값이라 실제 층수 확인 필요** (`LEVELS` 에 이름/OSM id 로 적고 스크립트 재실행).
+   - 모양(`CampusBuildingsLayer.tsx`): 층마다 벽 띠(1.3m, `#60646c`) + 창문 띠(`#3e4a59`) 를 번갈아 쌓음, 지붕 = 밝은 난간벽 고리(`#7a7f88`, 바깥 고리 − 중심 쪽 86% 축소 고리) + 안쪽 지붕 판(`#454950`), 바닥 그림자(남동쪽으로 민 반투명 면), 이름표(z15~, "대구경북과학기술원 " 접두어 제거). 색은 사용자 요청으로 **진한 회색** 계열.
+   - 알려진 흠: 강의동처럼 오목한 다각형은 "중심 쪽 축소"로 만든 지붕 테두리가 조금 어색하다.
+3. **도로**: 배경 도로 레이어를 걷어내고 직접 그림. 실제 폭(m) 기준 (`ROAD_WIDTH_M`: 간선 22, primary 17, secondary 13, tertiary 10, minor 6.5, service 4, track 3, 기타 2.5), 픽셀 변환은 `metersToPx` (512px 타일, 위도 35.7°: 1m = 2^z / 63565 px).
+   - 보도(연회색, 양쪽 +2.5m) → 아스팔트(큰길 `#4d5158`, 작은 길 `#62666e`) → 흰 가장자리선(`line-gap-width` 로 양쪽 두 줄, z15.5~) → 노란 중앙선(z15~) → 흰 점선 차선(z16~) → 작은 길 가운데 흰 점선(z16.5~). 보행로는 연한 점선.
+   - 횡단보도는 OpenMapTiles 데이터에 없어서 못 그림 (필요하면 OSM `highway=crossing` 을 따로 받아야 함).
+4. **내천·다리**: 배경의 waterway 선 레이어 제거 후 직접: 연두 둑(`waterway-bank`, 실제 폭 18~45m) + 물길(`waterway-stream`, 강 25/운하 10/하천 8/기타 3m). 다리(`brunnel=bridge`)는 그림자(남동 오프셋, 블러) + 밝은 상판 + 아스팔트 + 흰 난간(`line-gap-width`). 현풍천 위 다리 4곳 확인.
+5. **바닥·자연·하늘**: 바닥 `#f4f3f0`, 녹지 연두, 숲 진한 연두, 물 하늘색, 지형 음영(hillshade, AWS Terrarium DEM `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png`, CORS 허용·키 불필요), 3D 모드에서 지형 과장 1.4. 하늘·안개(`SKY`) 는 넣었지만 세로 화면에선 75°까지 기울여도 지평선이 거의 안 보인다.
+6. **3D 토글**: 상단 "3D" 버튼 → 기울기 50° + 지형 켜기 + 나침반 표시. 캠퍼스 건물은 토글과 무관하게 항상 그린다(위에서 보면 평면처럼 보임).
+   - react-map-gl 의 컨트롤은 생성 시 옵션만 읽어서 `key={is3d ? ... }` 로 다시 만든다 (줌·내 위치 버튼 둘 다 — 순서 유지).
+7. 원래 길찾기 담당의 `Buildings3DLayer`(배경 건물 전체를 세움)를 한때 그대로 가져왔다가, "캠퍼스만 3D" 결정 후 **빼고 우리 레이어로 대체**했다. 3D 는 이제 사용자(나) 담당.
+
+### 00.6 세미나 크롤링 운영 (중요)
+- 학생포탈은 로그인 필요 + 사용자 계정 **2차 인증을 끌 수 없음** → 서버 자동 로그인 불가 → **브라우저 쿠키를 서버에 넣는 방식**.
+- 쿠키 넣기: 크롬에서 포탈 로그인 → `https://stuecm.dgist.ac.kr/s/potal_board/_0002/listBbs.do` → F12 Network → `listBbs.do` → Request Headers `cookie:` 값 복사 →
+  `cd backend; .\.venv\Scripts\python.exe -m app.tools.upload_cookies` (배포 서버면 `--url https://서버`) → 입력창에 붙여넣기(화면에 안 보임) → 수집 결과(success/auth_expired)를 보여 줌.
+  - 실제로 있었던 실수: 쿠키 복사 후 명령어를 복사해 클립보드가 덮어써져 명령어 텍스트가 업로드됨 → 이제 쿠키 형식이 아니면 400 으로 거부한다.
+  - Claude 의 브라우저 패널에서는 세션 쿠키가 HttpOnly 라 꺼낼 수 없다 → 쿠키는 사용자가 직접 넣어야 한다.
+- 세션 만료되면 `crawl_logs.status=auth_expired`, 새 쿠키가 들어올 때까지 재시도 안 함(SSO 반복 요청·계정 잠금 방지). `DISCORD_WEBHOOK_URL` 이 있으면 알림. **세션이 며칠 유지되는지는 아직 모름.**
+- 파서 고친 뒤 기존 글 다시 파싱: `POST /api/v1/admin/seminar-crawl?pages=3&full=true` (헤더 `X-Admin-Token`). 일시를 못 찾게 된 글은 이때 DB 에서 지워진다.
+- 상태 확인: `GET /api/v1/admin/crawl-status`.
+- 현재 로컬 DB 에 실제 세미나 33건 (모두 건물 매핑됨, 이번 주 핀은 6개 건물).
+
+### 00.7 팀원 브랜치 통합 메모 (다음에 합칠 때 그대로 쓰기)
+**`feat/dohyeon-route` (김도현)** — 우리와 겹치는 파일은 빈 `__init__.py` 와 README 뿐, 거의 그대로 합쳐진다(한 번 해 봤음).
+- 백엔드: `app/routers/route.py`(`GET /route`, `GET /running-routes`), `app/services/route/graph.py`(표준 라이브러리 Dijkstra), `seed/walk_graph.json`(노드 6,233), `scripts/build_walk_graph.py`, `tests/test_route.py`. main 에서 `app.include_router(route.router, prefix="/api/v1")`.
+- 프론트: `layers/RouteLayer.tsx`, `RunningLayer.tsx`, `Buildings3DLayer.tsx`(→ **우리는 안 씀**, `CampusBuildingsLayer` 로 대체), `sheets/RoutePanel.tsx`, `store/route.ts`, `api/routeTypes.ts`, `api/hooks/useRoute.ts`(자체 fetch → 우리 `api/client.ts` 로 교체 TODO).
+- RouteLayer 와 RunningLayer 는 둘 다 지도 클릭을 쓰므로 토글을 서로 배타로. 기울기(DEM) 미구현(`ascent_m` null).
+- 루트에 `hyeonpung-map-handoff.md`(v2 원본)를 추가하는데 우리 `docs/handoff.md` 와 중복 → 합칠 때 정리.
+
+**`feat/db-part` (bamfiring)** — 문서: `makerthon/db-integration.md`, `makerthon/api-spec-db.md`. 겹치는 파일이 많아 **24개 파일 충돌**(add/add): `.gitignore`, `backend/alembic.ini`, `alembic/env.py`, `script.py.mako`, `app/core/config.py`, `db.py`, `errors.py`, `app/main.py`, `models/__init__.py`, `schemas/__init__.py`, `pyproject.toml`, `uv.lock`, `tests/conftest.py`, `tests/test_common.py`, 프론트 `.gitignore`, `index.html`, `package(-lock).json`, `src/index.css`, `main.tsx`, `tsconfig*.json`, `vite.config.ts`.
+- 그쪽 core 는 "통합 담당 파일로 교체할 임시 대역"이라고 적혀 있지만 이름 규칙이 다르다:
+  - 설정: 그쪽은 대문자 필드(`DATABASE_URL`, `JWT_SECRET`, `APP_ENV`, `KAKAO_REST_API_KEY`, `CAMPUS_LAT`, `CAMPUS_LNG`, `SERVICE_RADIUS_M`, `CORS_ORIGINS`) + `is_dev`, `cors_origin_list`, `DEV_JWT_SECRET`. `APP_ENV != dev` 인데 `JWT_SECRET` 이 기본값/빈 값이면 **`get_settings()` 가 RuntimeError** (서버가 안 켜짐) → 합치면 우리 `.env` 에 `APP_ENV=dev` 필요.
+    - 권장: 우리 Settings(소문자)에 필드를 추가하고 대문자 이름은 `@property` 별칭으로 제공 (pydantic-settings 는 환경변수 대소문자 무시라 같은 이름의 필드를 둘 두면 안 됨).
+  - 에러: 그쪽 `AppError(code, status, message, details)` + 헬퍼 `not_found/forbidden/conflict/validation` + `install_error_handlers`, 422 는 `details.fields` 포함, 409 `CONFLICT`·429 `RATE_LIMITED` 추가. 권장: 그쪽 errors.py 를 기반으로 우리 `ApiError(status, msg)` 를 `AppError` 하위 클래스로, `register_error_handlers = install_error_handlers` 별칭.
+  - db: 그쪽은 `create_db_and_tables()` 가 필요(테스트·dev). 우리 db.py 에 추가하면 됨. 그쪽 시간 타입은 `models/types.py` 의 `UTCDateTime`(UTC 로 돌려줌) — 우리 `TZDateTime`(KST 로 돌려줌)과 공존 가능.
+  - main: 우리 lifespan + 그쪽 `cleanup_loop()`, `reminder_loop()`(create_task, 종료 시 cancel) + 웹소켓 `/api/v1/ws` + 라우터(`restaurants, reports, meetups, presence`, dev 일 때 `dev_auth`) — 그쪽 라우터는 경로에 `/api/v1` 을 이미 포함(prefix 없이 include). 그쪽 health 는 우리 것으로.
+  - **Alembic 두 갈래**: 우리 `499aea6d3d2f_initial_tables` 와 그쪽 `17adb2052d3f_initial_db_part_tables`(+ `a1c3e5f70b21`) 둘 다 `down_revision=None` → head 두 개. 그쪽 17adb 의 `down_revision` 을 `'499aea6d3d2f'` 로 바꿔 한 줄로 잇는다. `script.py.mako` 는 `import sqlmodel`, `import app.core.db`, `import app.models.types` 모두 포함.
+  - 목록 응답: 그쪽은 `count`=이번 응답 개수, `total`=전체(`schemas/common.py` 의 `Page`, `make_page`). **우리 세미나는 `count` 에 전체 수를 넣고 있음 → 그쪽 방식으로 맞추기로 권장**(테스트 `assert_page` 가 `{items,count,total,updated_at}` 정확히 검사).
+  - 테스트: 그쪽 conftest 는 `db_url/engine/app/client/clock` 픽스처 + `login`, `restaurant_body`, `assert_error`, `assert_page` 헬퍼, `create_db_and_tables` 로 테이블 생성, `dependency_overrides[get_session]`. 우리 conftest(마이그레이션까지 거친 `client`, `session`)와 합쳐야 함. pyproject 에 `pyjwt`, `tzdata` 추가, ruff line-length 그쪽 120 / 우리 100.
+  - `users` 테이블은 "통합 담당 소유"(id 정수, email_hash UNIQUE null 허용, nickname UNIQUE, created_at). JWT: HS256, `sub`=사용자 정수 id. 우리 이메일 인증이 이걸 발급해야 함(아직 미구현, 그쪽은 dev-login 으로 대체 중).
+  - 프론트: 레이어가 `{ visible, onSelect }` 를 받음(onSelect 에 store 의 select 를 넘기면 됨), `SelectedItem` 에 `meetup`, `presence` 추가, 바텀시트에 `RestaurantSheet/ReportSheet/MeetupSheet/PresenceSheet`, 패널(`RestaurantPanel`, `ReportPanel`, `MeetupPanel`)을 탭에, 앱에서 한 번 `useRealtime()` + `<DbToaster/>` + `<InviteToast/>`, 지도 클릭을 `usePickStore.getState().handleClick({lng,lat})` 에도 연결(지금 우리는 클릭 = 바텀시트 닫기), 지도 감싼 div 에 `isolate`, Vite 프록시에 `ws: true`, `index.css` 의 `@theme` 색 토큰(`brand-*`, `sun-*`) 이전. `src/dev/` 는 버림.
+  - 그쪽 캠퍼스 중심 `35.7033, 128.4557` vs 우리 지도 중심 `35.7012, 128.4565`(지역 원 중심 `35.700, 128.4575`).
+  - 그쪽 문서에 "메인 지도(dohyun님)" 라고 적혀 있으나 실제 MapView 는 통합 담당(나) 소유.
+
+### 00.8 남은 일 (우선순위)
+1. **3D 작업 커밋·푸시** (00.1 목록). 메시지 예: `feat: miniature 3D map — campus buildings, stylized roads/streams, circular region fade`
+2. 캠퍼스 건물 **실제 층수 확인** → `build_campus_buildings.py` 의 `LEVELS` 수정 후 재실행. E1~E7 을 개별 건물로 나누려면 OSM 윤곽이 없으니 직접 다각형을 만들어야 함(구글·네이버에서 따오지 말 것).
+3. 3D 다듬기 후보: 오목한 건물 지붕 테두리, 캠퍼스 나무·잔디 같은 소품, 횡단보도(OSM crossing), 하늘이 보이게 기본 시점 조정.
+4. 버스 정류장 마커 겹침: 유가읍행정복지센터 앞/건너가 20m 거리라 핀이 겹친다 → 방향 화살표나 오프셋 필요.
+5. 팀원 브랜치 통합 (00.7) — 사용자가 시점을 정하면.
+6. 이메일 인증 + JWT (`users` 테이블, 6.7장) — DB 파트가 기다리는 부분.
+7. 배포: Dockerfile + docker-compose(backend + caddy) + Caddyfile, 영구 디스크, HTTPS. 배포 서버에 쿠키 다시 업로드.
+8. PWA(manifest, 아이콘), 셔틀 시간표(`seed/shuttle_timetable.json` 비어 있음), 버스 첫차·막차(`/busInfo/schedule`, 미사용).
+9. 세미나 레이어 토글 상태가 localStorage 에 저장돼 "꺼진 채로" 열릴 수 있음 — 처음 보는 사람이 헷갈림. (확인 중 브라우저 패널의 localStorage 를 한 번 지웠음)
+
+### 00.9 이번 세션에서 배운 함정
+- **Git Bash heredoc 이 한글·백슬래시를 망가뜨림** (`\b` 가 백스페이스 문자로, `"\n"` 이 실제 줄바꿈으로 들어감) → 파일 내용은 Write/Edit 도구로 쓰고, 셸 heredoc 은 순수 ASCII 일 때만.
+- `npx prettier --write src` 는 다른 사람 파일도 다시 포맷한다(팀원 파일을 그대로 두려면 `.prettierignore`). 또 `index.css`, `main.tsx` 를 줄바꿈만 바꿔 수정으로 표시함.
+- maplibre-gl v6 워커: Vite dev 에서 기본 경로가 깨짐 → `setWorkerUrl(import ...maplibre-gl-worker.mjs?worker&url)` + `optimizeDeps.exclude: ['maplibre-gl']` (MapView.tsx, vite.config.ts).
+- 대구 버스정보시스템: User-Agent 없으면 400, 사이트 언어 설정에 따라 노선명이 영어 → routeId 로 구분, 좌표계 EPSG:5187.
+- 학생포탈: 비로그인 요청은 `/sso/business.jsp` → `isign.dgist.ac.kr` 로 넘어감(이걸로 만료 감지). 목록 `a.selectListTitle[href*=NOTIWR_NO]`, 상세 `table.boardView` / `th strong b`(제목, 없을 수 있음) / `#cntn_kor_view td.boardViewBody`.
+- 세미나 일시 추출: 신청 마감 문장("~까지 신청")을 행사 일시로 착각하지 않게 라벨 없는 본문 검색에서는 신청·마감 줄을 뺀다. 끝 시각은 `12:00~13:30` 처럼 범위일 때만.
+- 장소 매칭: 별칭 길이가 같으면 먼저 나온 건물 ("E7 236호 및 E5 1층" → E7).
+- OSM `building:levels` 칸에 이름이 들어간 데이터가 있음(R4).
+- 테스트는 `tests/conftest.py` 에서 `ADMIN_TOKEN=""`, `SEMINAR_SOURCE=mock`, `BUS_SOURCE=mock` 등을 환경변수로 덮어 개발자 `.env` 의 영향을 막는다.
 
 ---
 
@@ -24,7 +162,7 @@
   - 하루 4회 전체 수집 → **10분마다 변경 감지(새 글만 상세) + 매일 05시 최근 3페이지 재확인**으로 변경
   - 세션 만료 시 `auth_expired` 기록 후 새 쿠키가 올 때까지 대기, 디스코드 웹훅 알림(선택)
   - 일시·장소는 본문의 "일시/Date/시간", "장소/Venue" 라벨 → 제목 → 본문 순으로 추출 (`app/services/seminar/dates.py`). 일시를 못 찾은 글은 저장하지 않음
-  - 건물 좌표는 OSM에 있는 E8·R2·R3만 확보. **E1~E7, R1 등은 지도 담당이 `seed/buildings.json`에 추가해야 지도에 표시됨**
+  - 건물 좌표: 사용자가 `seed/buildings.json` 에 E2~E8, R1~R3 를 채웠다 (별칭에 학과명도 넣어 둠 — 장소가 학과명으로만 적히면 오매칭 가능성 있음). 수정 후 서버 재시작하면 저장된 세미나도 다시 매핑된다
   - 관리자 API는 `ADMIN_TOKEN`(헤더 `X-Admin-Token`)이 설정돼야 켜진다
 - **스케줄러 위치**: `backend/scheduler.py` → `backend/app/scheduler.py` (패키지 안에서 import하기 위함).
 - **배경 지도 기본값**: `VITE_MAP_STYLE_URL`이 비어 있으면 OpenFreeMap(키 불필요, OSM)을 쓴다. MapTiler 키가 생기면 `.env`만 바꾼다. OpenFreeMap에서도 현풍 일대 도로명이 한글로 표시되는 것을 확인했다.
@@ -448,77 +586,78 @@ VITE_MAP_STYLE_URL=
 
 ---
 
-## 10. 내 To-do 리스트
+## 10. 내 To-do 리스트 (2026-11-21 진행 상황 반영)
 
 ### 0. 공통 준비
 - [x] 기술 스택·API 규격 확정 (이 문서)
-- [ ] **[높음]** 이 문서의 5~8장을 팀에 공유하고 맛집·길찾기·제보 담당자에게 초안 확인받기
-- [ ] **[높음]** 모노레포 뼈대 생성 (4장 구조, `.env.example`, README)
-- [ ] **[높음]** 수집 대상 이용 규정 확인 — 포탈 robots.txt·이용약관, API 이용 조건
+- [ ] **[높음]** 이 문서의 5~8장을 팀에 공유하고 맛집·길찾기·제보 담당자에게 초안 확인받기 — DB 파트는 `api-spec-db.md` 로 회신 옴(00.7)
+- [x] **[높음]** 모노레포 뼈대 생성 (4장 구조, `.env.example`, README) — `deploy/` 는 아직 없음
+- [x] **[높음]** 수집 대상 이용 규정 확인 — 학교 공문으로 크롤링 허가
 
 ### 1. 버스
-- [ ] **[높음]** 대상 정류장·노선 목록 확정 (캠퍼스 앞, 테크노폴리스 등 / 직행2 등)
-- [ ] **[높음]** 공공데이터 API 활용 신청 — 승인에 시간이 걸릴 수 있으니 가장 먼저
-- [ ] **[높음]** `seed/bus_stops.json` 작성 (정류장명 ↔ 외부 ID ↔ 좌표)
-- [ ] **[높음]** API 호출·응답 파싱 (노선명, 도착 예정 시간, 남은 정류장 수)
-- [ ] **[중간]** 대상 노선의 API 포함 여부 확인 → 빠지면 시간표 기반으로 대체
-- [ ] **[높음]** 메모리 캐시 + 30초 갱신 작업 + `is_stale` 처리
-- [ ] **[중간]** `seed/shuttle_timetable.json` + 다음 출발 계산
-- [ ] **[중간]** `GET /bus/stops`, `GET /bus/arrivals` 구현 + 테스트
+- [x] 대상 정류장·노선 확정 (유가읍행정복지센터앞/건너, 중흥S클래스앞 / 직행2, 급행8, 급행8-1)
+- [x] ~~공공데이터 API 신청~~ → 대구 버스정보시스템 JSON 크롤링으로 대체
+- [x] `seed/bus_stops.json` (정류장명 ↔ bsId ↔ 좌표, 노선 routeId ↔ 이름·방향)
+- [x] 호출·응답 파싱 (`app/services/bus/crawl.py`, 실제 응답 샘플 `tests/fixtures/businfo_arr2_*.json`)
+- [x] 메모리 캐시 + 30초 갱신 + `is_stale`
+- [ ] **[중간]** `seed/shuttle_timetable.json` 채우기 (형식만 있음, 계산 로직은 완료)
+- [x] `GET /bus/stops`, `GET /bus/arrivals` + 테스트
+- [ ] **[낮음]** 첫차·막차·배차 (`/busInfo/schedule`, `/busInfo/gapList`) 활용
+- [ ] **[중간]** 앞/건너 정류장 마커 겹침 해결
 
 ### 2. 세미나
-- [ ] **[높음]** 포탈 구조 파악 (로그인, URL 구조, 페이지 넘김, 정적/동적)
-- [ ] **[높음]** 학교에 데이터 제공·크롤링 허가 문의
-- [ ] **[중간]** 수집 대상 게시판 범위 결정
-- [ ] **[높음]** 크롤러 작성 (`fetch_list()`, `parse_detail()`), 요청 간격 1초 이상
-- [ ] **[높음]** 필드 추출·날짜 파싱
-- [ ] **[높음]** `seed/buildings.json` + 장소 텍스트 매칭 (지도 담당과 함께)
-- [ ] **[중간]** `source_id` 기준 중복 제거·수정 반영
-- [ ] **[중간]** 하루 4회 스케줄 + `crawl_logs` 기록
-- [ ] **[중간]** `GET /seminars`, `GET /seminars/{id}` 구현 + 테스트
-- [ ] **[낮음]** 매핑 실패 목록 확인·수동 보정 방법 마련
+- [x] 포탈 구조 파악 (로그인 필요, 정적 HTML, `currentPage` 페이지 넘김)
+- [x] 학교 허가 (공문)
+- [x] 수집 대상: 학생포탈 "세미나 공지" 게시판 (`_0002`, BD000254)
+- [x] 크롤러 (`fetch_list`, `parse_detail`), 요청 간격 1초, 쿠키 방식 로그인
+- [x] 일시·장소 추출 (실제 표기 30여 개로 테스트)
+- [x] `seed/buildings.json` (사용자가 E2~E8, R1~R3 좌표 채움) + 장소 매칭 + 서버 시작 시 재매핑
+- [x] `source_id` 기준 upsert, 일시 못 찾은 글 삭제
+- [x] 스케줄(10분 변경 감지 + 매일 05시 재확인) + `crawl_logs`
+- [x] `GET /seminars`, `GET /seminars/{id}` + 테스트
+- [ ] **[중간]** 목록 응답 `count`/`total` 을 DB 파트 규격으로 맞추기 (00.7)
+- [ ] **[낮음]** 매핑 실패·일시 추출 실패 글 확인 화면
 
 ### 3. 백엔드 통합
-- [ ] **[높음]** 공통 설정: config, DB(WAL), 에러 형식, CORS, health
-- [ ] **[높음]** Alembic 초기 마이그레이션 + seed 로더
-- [ ] **[높음]** 스케줄러를 lifespan에 연결 (워커 1개 전제)
-- [ ] **[중간]** 이메일 인증 + JWT (맛집 담당과 협의)
-- [ ] **[중간]** 팀원 라우터 머지·규격 준수 확인
-- [ ] **[낮음]** 크롤러 실패 알림 (디스코드 웹훅)
+- [x] 공통 설정: config, DB(WAL), 에러 형식, CORS, health
+- [x] Alembic 초기 마이그레이션 + seed 로더
+- [x] 스케줄러를 lifespan 에 연결 (워커 1개 전제)
+- [ ] **[중간]** 이메일 인증 + JWT (`users` 테이블은 통합 담당 소유, DB 파트가 기다림)
+- [ ] **[중간]** 팀원 브랜치 머지 (00.7 — 사용자가 시점 결정)
+- [x] 크롤러 실패 알림 (디스코드 웹훅, `DISCORD_WEBHOOK_URL`)
+- [x] 관리자 API (쿠키 업로드, 수집 상태, 수동 재수집)
 
 ### 4. 프론트엔드
-- [ ] **[높음]** Vite + React + TS + Tailwind + TanStack Query + Zustand 세팅, `/api` 프록시
-- [ ] **[높음]** `MapView` + 배경 지도 띄우기 → 현풍 한글 표기 품질 확인 (부족하면 브이월드)
-- [ ] **[높음]** `api/types.ts`에 6장 타입 작성, `client.ts` 에러 처리
-- [ ] **[높음]** 공통 UI: `LayerToggle`, `BottomSheet`, 하단 탭
-- [ ] **[높음]** `BusLayer` + 버스 바텀시트 + 즐겨찾기(localStorage)
-- [ ] **[높음]** `SeminarLayer` + 세미나 목록 탭 + 상세 바텀시트
-- [ ] **[중간]** 내 위치 표시 (Geolocation)
-- [ ] **[중간]** 팀원 레이어(맛집·길찾기·제보) 연결
+- [x] Vite + React + TS + Tailwind + TanStack Query + Zustand, `/api` 프록시
+- [x] `MapView` + 배경 지도 (OpenFreeMap, 한글 표기 OK) → 미니어처 스타일로 변환
+- [x] `api/types.ts`, `client.ts`
+- [x] 공통 UI: `LayerToggle`(버스·세미나·3D), `BottomSheet`, 하단 탭
+- [x] `BusLayer` + 버스 시트 + 즐겨찾기
+- [x] `SeminarLayer` + 세미나 목록 탭 + 상세 시트 ("종일" 표시 포함)
+- [x] 내 위치 (GeolocateControl)
+- [x] **3D 지도** (00.5) — 커밋 필요
+- [ ] **[중간]** 팀원 레이어(맛집·길찾기·제보·밥친구) 연결
 - [ ] **[중간]** PWA 설정 (아이콘, manifest)
 
 ### 5. 배포·마무리
 - [ ] **[중간]** Dockerfile + docker-compose + Caddyfile
-- [ ] **[중간]** 서버 배포 (영구 디스크, HTTPS)
+- [ ] **[중간]** 서버 배포 (영구 디스크, HTTPS) + 포탈 쿠키 재업로드
 - [ ] **[중간]** 실제 데이터로 통합 테스트 (폰에서 확인)
-- [ ] **[낮음]** README: 실행 방법, API 키 발급 방법, 장애 대응
+- [x] README: 실행 방법, 쿠키 넣기, 수집 소스 바꾸기
 
 ---
 
 ## 11. 아직 정해지지 않은 것
 
-- 버스 대상 정류장·노선 목록, 사용할 API의 정확한 이름과 호출 한도
-- 학교 포탈의 접근 방식(로그인 여부)과 학교의 데이터 제공 가능 여부
 - 배포 서버 (학교 서버 vs 클라우드 VM)
-- 제보 기능의 최종 방향과 `type` 값
-- 6.4~6.6은 담당 팀원의 확인 전 초안
+- 제보 기능 최종 방향 (DB 파트는 `police` 우선, `dark_road`/`hazard` 예비로 구현함)
+- 팀원 브랜치를 언제 합칠지 (사용자가 미뤄 둠)
+- 포탈 세션 쿠키가 얼마나 유지되는지 (운영해 봐야 앎), 장기 운영 시 크롤링 전용 계정 필요 여부
+- 캠퍼스 건물 실제 층수
 
-## 12. Claude Code에게 — 첫 작업 순서
+## 12. 다음 Claude 세션에게 — 첫 작업 순서
 
-1. 4장 구조로 모노레포 뼈대 생성 (`backend/`, `frontend/`, `docs/`, `deploy/`, `.env.example`, `README.md`)
-2. 백엔드: config, DB(WAL), 공통 에러 형식, CORS, `GET /api/v1/health`
-3. `docs/api-spec.md`에 이 문서 5~6장을 옮겨 팀 공유용으로 정리
-4. 백엔드: `buildings`, `bus_stops`, `seminars` 모델 + Alembic + seed 로더 (seed는 예시 데이터 2~3개로 시작)
-5. 버스: API 클라이언트 골격 + 메모리 캐시 + 스케줄러. 실제 응답 샘플을 받기 전까지는 **가짜 클라이언트(mock)**로 `/bus/arrivals`가 동작하게
-6. 세미나: 크롤러 인터페이스(`fetch_list`, `parse_detail`)와 장소 매칭 함수 + 테스트. 포탈 구조 확인 전이므로 실제 파싱은 보류
-7. 프론트: Vite 세팅, `MapView`, `api/types.ts`, `BusLayer`·`SeminarLayer`를 mock 데이터로 먼저 연결
+1. 이 문서 00장을 읽는다. `cd github && git status` 로 00.1 의 미커밋 목록과 같은지 확인한다.
+2. 미리보기 서버(`backend`, `frontend`)를 띄우고 브라우저 패널에서 지도를 연다. 3D 토글·확대해서 00.5 의 모습이 나오는지 확인한다.
+3. 사용자에게 3D 작업 커밋·푸시 여부를 묻는다 (00.8-1).
+4. 이후 00.8 의 우선순위대로. 3D 는 사용자 피드백을 받으며 다듬는 중이었다 (마지막 요청: 원형 경계·캠퍼스 밖 건물 윤곽만·캠퍼스 예쁘게·내천과 다리 → 모두 반영 완료, 다음 피드백 대기).
