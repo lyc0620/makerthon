@@ -4,7 +4,6 @@ import { type LayerKey, useUi } from '../store/ui'
 const ITEMS: { key: LayerKey; label: string; icon: string }[] = [
   { key: 'bus', label: '버스', icon: '🚌' },
   { key: 'seminar', label: '세미나', icon: '🎤' },
-  { key: 'buildings3d', label: '3D', icon: '🏢' },
 ]
 
 export default function LayerToggle() {

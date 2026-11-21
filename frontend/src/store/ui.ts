@@ -8,7 +8,7 @@ export type SelectedItem =
   | { type: 'report'; id: string }
   | null
 
-export type LayerKey = 'bus' | 'seminar' | 'restaurant' | 'route' | 'report' | 'buildings3d'
+export type LayerKey = 'bus' | 'seminar' | 'restaurant' | 'route' | 'report'
 export type Tab = 'map' | 'seminars' | 'bus'
 
 type UiState = {
@@ -52,7 +52,6 @@ export const useUi = create<UiState>()(
         restaurant: true,
         route: true,
         report: false,
-        buildings3d: false,
       },
       toggleLayer: (key) => set((s) => ({ layers: { ...s.layers, [key]: !s.layers[key] } })),
 

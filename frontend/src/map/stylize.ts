@@ -15,6 +15,8 @@ import type {
   StyleSpecification,
 } from 'maplibre-gl'
 
+import { cloudData } from './clouds'
+
 export const PALETTE = {
   ground: '#f4f3f0',
   residential: '#f1efea',
@@ -40,6 +42,10 @@ export const PALETTE = {
   campusParapet: '#7a7f88', // 지붕 테두리(난간벽): 살짝 밝게
   campusShadow: '#2a2d33',
   outside: '#e9e7e2', // 지역 밖 (가림막)
+  cloudBase: '#e6edf4', // 구름 밑단: 살짝 푸른 회색
+  cloudMid: '#f4f8fb',
+  cloudTop: '#ffffff',
+  cloudShadow: '#5d7183', // 땅에 드리운 구름 그림자
   sky: '#8ec5f4',
   horizon: '#dceffc',
   fog: '#eef6fb',
@@ -52,7 +58,7 @@ export const PALETTE = {
  */
 export const REGION_CENTER = { lng: 128.4575, lat: 35.7 }
 const REGION_RADIUS_KM = 3.6
-const FADE_KM = 1.3
+const FADE_KM = 0.7 // 경계는 구름(clouds.ts)이 가리므로 흐림 구간은 짧게
 const FADE_STEPS = 16
 
 const KM_PER_DEG_LAT = 111.32
@@ -438,6 +444,142 @@ function bridgeLayers(source: string): LayerSpecification[] {
   ] as LayerSpecification[]
 }
 
+// ───────── 캠퍼스 물길(E7~E8 사이)의 끊긴 곳 ─────────
+// OSM 에서 물길이 여러 조각으로 나뉘어 있고 그 틈으로 길이 지난다.
+// 좁은 틈 = 다리, 넓은 틈 = 도로 (public/data/campus-water.geojson ← backend/scripts/build_campus_water.py)
+const CAMPUS_WATER_SOURCE = 'campus-water'
+const campusWaterData = () =>
+  typeof location === 'undefined'
+    ? '/data/campus-water.geojson'
+    : new URL('/data/campus-water.geojson', location.origin).href // 워커는 상대 경로를 못 푼다
+const kindIs = (kind: string): ExpressionSpecification => ['==', ['get', 'kind'], kind]
+const widthOf: ExpressionSpecification = ['get', 'width_m']
+
+// 틈 메우기: 다리 밑은 물로(물길이 이어져 흐르게), 도로가 지나는 틈은 보도 포장으로
+const campusGapLayers = (): LayerSpecification[] => [
+  {
+    id: 'campus-gap-water',
+    type: 'fill',
+    source: CAMPUS_WATER_SOURCE,
+    filter: kindIs('gap_water'),
+    paint: { 'fill-color': PALETTE.water },
+  },
+  {
+    id: 'campus-gap-paved',
+    type: 'fill',
+    source: CAMPUS_WATER_SOURCE,
+    filter: kindIs('gap_paved'),
+    paint: { 'fill-color': PALETTE.sidewalk },
+  },
+]
+
+// 넓은 틈을 지나는 길: 다른 작은 길과 같은 모양 (보도 → 아스팔트 → 가운데 흰 점선)
+const campusRoadLayers = (): LayerSpecification[] => {
+  const base = { source: CAMPUS_WATER_SOURCE, filter: kindIs('road') } as const
+  const round = { 'line-cap': 'round', 'line-join': 'round' } as const
+  return [
+    {
+      ...base,
+      id: 'campus-road-sidewalk',
+      type: 'line',
+      layout: round,
+      paint: { 'line-color': PALETTE.sidewalk, 'line-width': metersToPx(['+', widthOf, 5]) },
+    },
+    {
+      ...base,
+      id: 'campus-road-asphalt',
+      type: 'line',
+      layout: round,
+      paint: { 'line-color': PALETTE.asphaltMinor, 'line-width': metersToPx(widthOf, 0.6) },
+    },
+    {
+      ...base,
+      id: 'campus-road-center',
+      type: 'line',
+      minzoom: 16.5,
+      paint: {
+        'line-color': PALETTE.laneLine,
+        'line-width': ['interpolate', ['linear'], ['zoom'], 16.5, 0.6, 19, 1.2],
+        'line-dasharray': [4, 4],
+        'line-opacity': 0.8,
+      },
+    },
+  ]
+}
+
+// 좁은 틈의 보행 다리: 다른 보행 다리와 같은 모양 (그림자 + 밝은 상판 + 흰 난간)
+const campusBridgeLayers = (): LayerSpecification[] => {
+  const base = { source: CAMPUS_WATER_SOURCE, filter: kindIs('bridge') } as const
+  return [
+    {
+      ...base,
+      id: 'campus-bridge-shadow',
+      type: 'line',
+      paint: {
+        'line-color': '#1f3b4d',
+        'line-opacity': 0.25,
+        'line-width': metersToPx(['+', widthOf, 2]),
+        'line-translate': [3, 4],
+        'line-blur': 2,
+      },
+    },
+    {
+      ...base,
+      id: 'campus-bridge-deck',
+      type: 'line',
+      paint: { 'line-color': PALETTE.bridgeDeck, 'line-width': metersToPx(widthOf) },
+    },
+    {
+      ...base,
+      id: 'campus-bridge-rail',
+      type: 'line',
+      minzoom: 15,
+      paint: {
+        'line-color': PALETTE.bridgeRail,
+        'line-width': ['interpolate', ['linear'], ['zoom'], 15, 0.8, 19, 2.2],
+        'line-gap-width': metersToPx(['-', widthOf, 0.8]),
+      },
+    },
+  ]
+}
+
+// ───────── 경계 구름 ─────────
+const CLOUD_SOURCE = 'region-clouds'
+// 땅 위 그림자: 꼭대기 단은 빼고(겹쳐 진해지지 않게) 남동쪽으로 밀어 흐리게
+const cloudShadowLayer = (): LayerSpecification => ({
+  id: 'region-cloud-shadow',
+  type: 'fill',
+  source: CLOUD_SOURCE,
+  filter: ['==', ['get', 'tier'], 0],
+  paint: {
+    'fill-color': PALETTE.cloudShadow,
+    'fill-opacity': 0.1,
+    'fill-translate': [18, 24],
+    'fill-translate-anchor': 'map',
+    'fill-antialias': false,
+  },
+})
+const cloudLayer = (): LayerSpecification => ({
+  id: 'region-clouds',
+  type: 'fill-extrusion',
+  source: CLOUD_SOURCE,
+  paint: {
+    'fill-extrusion-color': [
+      'match',
+      ['get', 'tier'],
+      0,
+      PALETTE.cloudBase,
+      1,
+      PALETTE.cloudMid,
+      PALETTE.cloudTop,
+    ],
+    'fill-extrusion-base': ['get', 'base'],
+    'fill-extrusion-height': ['get', 'top'],
+    'fill-extrusion-opacity': 1,
+    'fill-extrusion-vertical-gradient': true, // 아래쪽 면이 살짝 어두워져 입체감
+  },
+})
+
 const maskLayer = (): LayerSpecification => ({
   id: 'region-mask',
   type: 'fill',
@@ -475,10 +617,11 @@ export function stylize(style: StyleSpecification): StyleSpecification {
   s.sources[DEM_SOURCE_ID] = demSource()
   s.sources[HILLSHADE_SOURCE_ID] = demSource() // 지형과 음영은 소스를 따로 쓰는 게 MapLibre 권장
   s.sources['region-mask'] = { type: 'geojson', data: maskData() }
+  s.sources[CAMPUS_WATER_SOURCE] = { type: 'geojson', data: campusWaterData() }
 
   const firstSymbol = s.layers.findIndex((l) => l.type === 'symbol')
   const at = firstSymbol >= 0 ? firstSymbol : s.layers.length
-  // 지면 위(녹지·물 다음), 글자 아래에: 음영 → 물가·내천 → 건물 윤곽 → 도로 → 다리
+  // 지면 위(녹지·물 다음), 글자 아래에: 음영 → 물가·내천(+캠퍼스 물길 틈) → 건물 윤곽 → 도로 → 다리
   s.layers.splice(
     at,
     0,
@@ -487,14 +630,27 @@ export function stylize(style: StyleSpecification): StyleSpecification {
       ? [
           waterbankLayer(vectorSource),
           waterwayLayer(vectorSource),
+          ...campusGapLayers(),
           ...footprintLayers(vectorSource),
           ...roadLayers(vectorSource),
+          ...campusRoadLayers(),
           ...bridgeLayers(vectorSource),
+          ...campusBridgeLayers(),
         ]
       : []),
   )
   // 가림막은 맨 위 (지역 밖 지명 글자까지 덮는다). 앱 레이어(캠퍼스 건물 등)는 그 뒤에 추가된다
-  s.layers.push(maskLayer())
+  // 구름: 그림자는 가림막 아래(지역 안 땅에만 보이게), 구름 본체는 가림막 위에 띄운다
+  s.sources[CLOUD_SOURCE] = {
+    type: 'geojson',
+    data: cloudData({
+      ...REGION_CENTER,
+      radiusKm: REGION_RADIUS_KM,
+      kmPerDegLng: KM_PER_DEG_LNG,
+      kmPerDegLat: KM_PER_DEG_LAT,
+    }),
+  }
+  s.layers.push(cloudShadowLayer(), maskLayer(), cloudLayer())
   s.sky = SKY
   return s
 }

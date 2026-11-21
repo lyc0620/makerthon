@@ -3,6 +3,7 @@ import { Marker } from 'react-map-gl/maplibre'
 
 import { useSeminars } from '../api/hooks/seminars'
 import type { Seminar } from '../api/types'
+import MapPin from '../components/MapPin'
 import { useUi } from '../store/ui'
 import type { LayerProps } from './types'
 
@@ -39,20 +40,14 @@ export default function SeminarLayer({ visible }: LayerProps) {
           select({ type: 'seminar', id: first.id })
         }}
       >
-        <button
-          type="button"
-          aria-label={`세미나 ${list.length}건`}
-          className={`relative flex size-9 items-center justify-center rounded-full border-2 border-white text-base shadow-md transition ${
-            active ? 'scale-110 bg-indigo-700' : 'bg-indigo-500'
-          }`}
-        >
-          <span aria-hidden>🎤</span>
-          {list.length > 1 && (
-            <span className="absolute -top-1 -right-1 rounded-full bg-rose-500 px-1.5 text-[10px] font-bold text-white">
-              {list.length}
-            </span>
-          )}
-        </button>
+        <MapPin
+          icon="🎤"
+          color="#6366f1"
+          activeColor="#4338ca"
+          active={active}
+          count={list.length}
+          label={`세미나 ${list.length}건`}
+        />
       </Marker>
     )
   })

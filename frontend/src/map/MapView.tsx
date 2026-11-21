@@ -7,8 +7,9 @@ import { type ReactNode, useEffect, useState } from 'react'
 import { GeolocateControl, Map, NavigationControl } from 'react-map-gl/maplibre'
 
 import { useUi } from '../store/ui'
-import Map3DSync from './Map3DSync'
-import { loadStylizedStyle, PALETTE, VIEW_BOUNDS } from './stylize'
+import { DEM_SOURCE_ID, loadStylizedStyle, PALETTE, VIEW_BOUNDS } from './stylize'
+
+const PITCH_3D = 50
 
 /** 배경 스타일을 받아 미니어처 색으로 바꾼다. 실패하면 원래 스타일 URL 을 그대로 쓴다. */
 function useStylizedStyle(url: string): StyleSpecification | string | null {
@@ -40,7 +41,6 @@ type Props = { children?: ReactNode }
 /** 앱 전체에 지도는 이것 하나. 기능별 레이어는 children 으로 끼운다. */
 export default function MapView({ children }: Props) {
   const select = useUi((s) => s.select)
-  const is3d = useUi((s) => !!s.layers.buildings3d)
   const mapStyle = useStylizedStyle(STYLE_URL)
 
   if (!mapStyle) return <div className="absolute inset-0" style={{ background: PALETTE.ground }} />
@@ -52,7 +52,13 @@ export default function MapView({ children }: Props) {
         latitude: CAMPUS_CENTER.lat,
         longitude: CAMPUS_CENTER.lng,
         zoom: 14.6,
+        pitch: PITCH_3D,
       }}
+      // 지도는 항상 3D: 기울인 시점 + 지형(산). 3D 켜기/끄기 버튼은 없앴다 (2026-11-21 사용자 결정)
+      // (스타일 변환에 실패해 원본 URL 을 쓰는 경우엔 고도 소스가 없으므로 지형 없이)
+      terrain={
+        typeof mapStyle === 'string' ? undefined : { source: DEM_SOURCE_ID, exaggeration: 1.4 }
+      }
       style={{ position: 'absolute', inset: 0 }}
       attributionControl={{ compact: true }}
       maxPitch={75} // 많이 기울이면 뒤쪽 산과 하늘이 보인다
@@ -64,22 +70,14 @@ export default function MapView({ children }: Props) {
       }}
       onClick={() => select(null)} // 빈 곳을 누르면 바텀시트 닫기 (마커는 이벤트 전파를 막는다)
     >
-      {/* 3D 에서는 회전·기울기가 생기므로 나침반(누르면 북쪽·수평으로 복귀)을 보여 준다 */}
+      {/* 항상 3D: 회전·기울기가 있으므로 나침반(누르면 북쪽·수평으로 복귀)을 보여 준다 */}
       <NavigationControl
-        key={is3d ? 'nav-3d' : 'nav-2d'} // 컨트롤은 생성 시 옵션만 읽으므로 모드가 바뀌면 새로 만든다
         position="top-right"
-        showCompass={is3d}
+        showCompass
         visualizePitch
         style={{ marginTop: 64 }}
       />
-      {/* 줌 버튼과 함께 다시 만들어 순서(줌 → 내 위치)가 바뀌지 않게 */}
-      <GeolocateControl
-        key={is3d ? 'geo-3d' : 'geo-2d'}
-        position="top-right"
-        trackUserLocation
-        showAccuracyCircle
-      />
-      <Map3DSync enabled3d={is3d} />
+      <GeolocateControl position="top-right" trackUserLocation showAccuracyCircle />
       {children}
     </Map>
   )
