@@ -137,30 +137,47 @@ def test_my_vote_and_revote(client, clock):
     again = vote(client, b, report["id"], "confirm").json()
     assert again["confirm_count"] == 1 and again["expires_at"] == expires_once  # 같은 표로는 또 연장 안 돼요
 
+    # 확인했던 사람이 '없어졌어요'로 바꾸면 표가 바뀌고 제보는 바로 내려가요
     changed = vote(client, b, report["id"], "deny").json()
     assert changed["my_vote"] == "deny" and changed["confirm_count"] == 0 and changed["deny_count"] == 1
-    listed = client.get("/api/v1/reports", headers=b).json()["items"][0]
-    assert listed["my_vote"] == "deny"
+    assert changed["is_active"] is False
     assert_error(vote(client, b, report["id"], "maybe"), 422, "VALIDATION_ERROR")
     assert_error(vote(client, b, "rpt_999", "deny"), 404, "NOT_FOUND")
 
 
-def test_confirm_deny_confirm_extends_only_once(client, clock):
-    """확인 → 없어요 → 확인을 반복해도 한 사람은 처음 한 번만 15분 연장돼요 (사용자가 찾은 버그)."""
+def test_reconfirm_extends_only_after_5_minutes(client, clock):
+    """같은 사람이 "아직 있어요"를 다시 누르면, 마지막 연장 뒤 5분이 지났을 때만 15분 늘어나요."""
     a, b = login(client, "사슴"), login(client, "고양이")
     report = post_report(client, a).json()
     once = vote(client, b, report["id"], "confirm").json()["expires_at"]
-    for _ in range(3):
-        clock.advance(minutes=1)
-        vote(client, b, report["id"], "deny")
-        again = vote(client, b, report["id"], "confirm").json()
-        assert again["expires_at"] == once and again["confirm_count"] == 1
 
-    # 처음에 '없어요'를 눌렀다가 나중에 '확인'으로 바꾼 사람은 그때 한 번 연장돼요
-    c = login(client, "여우")
-    vote(client, c, report["id"], "deny")
-    late = vote(client, c, report["id"], "confirm").json()
-    assert late["expires_at"] > once
+    clock.advance(minutes=2)
+    assert vote(client, b, report["id"], "confirm").json()["expires_at"] == once  # 5분 안이라 그대로
+
+    clock.advance(minutes=3)
+    later = vote(client, b, report["id"], "confirm").json()
+    assert later["expires_at"] > once and later["confirm_count"] == 1  # 5분이 지나서 다시 연장, 표 수는 그대로
+    assert vote(client, b, report["id"], "confirm").json()["expires_at"] == later["expires_at"]  # 바로 또 누르면 그대로
+
+
+def test_vouched_person_saying_gone_hides_right_away(client):
+    """'있다'고 했던 사람(처음 제보한 사람, 확인한 사람)이 '없어졌어요'를 누르면 바로 내려가요."""
+    a, b, c = login(client, "사슴"), login(client, "고양이"), login(client, "여우")
+
+    # 확인했던 사람이 없어졌다고 하면 → 바로 내림 (다른 사람 확인이 더 많아도)
+    report = post_report(client, a).json()
+    vote(client, b, report["id"], "confirm")
+    vote(client, c, report["id"], "confirm")
+    gone = vote(client, b, report["id"], "deny").json()
+    assert gone["is_active"] is False
+
+    # 처음 제보한 사람이 없어졌다고 해도 → 바로 내림
+    report2 = post_report(client, c, lat=35.7100, lng=128.4700).json()  # 제보는 2분에 한 번이라 다른 사람이 올려요
+    assert vote(client, c, report2["id"], "deny").json()["is_active"] is False
+
+    # 확인한 적 없는 사람의 '없어졌어요' 한 표는 바로 내리지 않아요
+    report3 = post_report(client, b, lat=35.7200, lng=128.4800).json()
+    assert vote(client, a, report3["id"], "deny").json()["is_active"] is True
 
 
 def test_expired_report(client, clock):

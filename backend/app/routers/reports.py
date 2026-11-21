@@ -115,9 +115,14 @@ def _public(view: dict) -> dict:
     return {**view, "my_vote": None}
 
 
+# 같은 사람이 다시 "아직 있어요"로 시간을 늘리려면 마지막 연장 뒤 이만큼 지나야 해요
+REEXTEND_AFTER = timedelta(minutes=5)
+
+
 def _cast_vote(session: Session, report: Report, user: User, vote: str) -> None:
-    """표를 넣거나 바꿔요. '확인'이면 시간을 연장하는데, 한 사람당 제보 하나에 한 번만이에요.
-    (확인 → 없어요 → 확인을 반복해도 처음 한 번만 늘어나요. 커밋은 부르는 쪽에서)"""
+    """표를 넣거나 바꿔요. '확인'이면 시간을 연장해요.
+    같은 사람은 마지막 연장 뒤 5분이 지나야 다시 연장돼요 (확인·없어요를 빠르게 반복해도 안 늘어나요).
+    커밋은 부르는 쪽에서 해요."""
     now = timeutil.now_utc()
     existing = session.get(ReportVote, (report.id, user.id))
     if existing is None:
@@ -125,11 +130,12 @@ def _cast_vote(session: Session, report: Report, user: User, vote: str) -> None:
     else:
         existing.vote = vote
         existing.created_at = now
-    if vote == "confirm" and not existing.extended:
+    last = timeutil.as_aware(existing.extended_at) if existing.extended_at else None
+    if vote == "confirm" and (last is None or now - last >= REEXTEND_AFTER):
         rule = TYPE_RULES[report.type]
         report.last_confirmed_at = now
         report.expires_at = max(report.expires_at, now) + timedelta(minutes=rule.extend_min)
-        existing.extended = True
+        existing.extended_at = now
         session.add(report)
     session.add(existing)
 
@@ -291,12 +297,18 @@ def vote_report(
     if not _is_active(report):
         raise conflict("이미 내려간 제보예요.")
 
+    # "있다"고 했던 사람(처음 제보한 사람, 한 번이라도 "아직 있어요"를 누른 사람)이
+    # "없어졌어요"를 누르면 직접 본 사람이 확인한 거라 바로 내려요.
+    before = session.get(ReportVote, (report.id, user.id))
+    vouched = report.user_id == user.id or (before is not None and before.extended_at is not None)
+
     _cast_vote(session, report, user, body.vote)
     session.commit()
     session.refresh(report)
 
     counts = _vote_counts(session, [report.id])[report.id]
-    if counts["deny"] >= HIDE_MIN_DENY and counts["deny"] > counts["confirm"]:
+    retracted = body.vote == "deny" and vouched
+    if retracted or (counts["deny"] >= HIDE_MIN_DENY and counts["deny"] > counts["confirm"]):
         report.status = "hidden"
         session.add(report)
         session.commit()

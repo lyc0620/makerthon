@@ -34,8 +34,8 @@ export function ReportSheet({ id }: { id: string }) {
           toast(
             v === "confirm"
               ? res.expires_at !== r.expires_at
-                ? "확인해 줘서 고마워요! 15분 더 보여요."
-                : "다시 확인했어요. 시간 연장은 한 사람당 한 번이에요."
+                ? "확인해 줘서 고마워요!"
+                : "방금 확인했어요. 5분 뒤에 다시 누를 수 있어요."
               : res.is_active
                 ? "알려 줘서 고마워요."
                 : "제보를 내렸어요. 고마워요!",
@@ -65,7 +65,7 @@ export function ReportSheet({ id }: { id: string }) {
         {r.description ?? "설명 없이 올라온 제보예요."}
       </p>
 
-      {!r.is_active && <Notice tone="yellow">이미 내려간 제보예요. (시간이 지났거나 &lsquo;없어졌어요&rsquo;가 많았어요)</Notice>}
+      {!r.is_active && <Notice tone="yellow">이미 내려간 제보예요. (시간이 지났거나 &lsquo;없어졌어요&rsquo; 표가 들어왔어요)</Notice>}
 
       <section className="space-y-2 rounded-2xl bg-white p-4 ring-1 ring-slate-100">
         <div className="flex items-baseline justify-between">
@@ -105,15 +105,17 @@ export function ReportSheet({ id }: { id: string }) {
               ] as const
             ).map(([v, icon, label, onCls]) => {
               const voted = r.my_vote === v;
+              // '아직 있어요'는 이미 눌렀어도 다시 누를 수 있어요 (마지막 연장 5분 뒤부터 다시 늘어나요)
+              const locked = voted && v === "deny";
               const busy = vote.isPending && vote.variables?.vote === v;
               return (
                 <button
                   key={v}
                   type="button"
                   aria-pressed={voted}
-                  aria-disabled={voted || vote.isPending || undefined}
+                  aria-disabled={locked || vote.isPending || undefined}
                   onClick={() => {
-                    if (!voted && !vote.isPending) onVote(v);
+                    if (!locked && !vote.isPending) onVote(v);
                   }}
                   className={cx(
                     "press flex h-14 w-full items-center justify-center gap-2 rounded-2xl text-base font-extrabold transition",
@@ -151,8 +153,10 @@ export function ReportSheet({ id }: { id: string }) {
             {thanked
               ? "고마워요! 덕분에 다른 친구들이 안전하게 다녀요 🙌"
               : r.my_vote
-                ? `내 표: ${r.my_vote === "confirm" ? "아직 있어요" : "없어졌어요"} · 다른 쪽을 누르면 바꿀 수 있어요`
-                : "'아직 있어요'는 한 사람당 한 번 15분 더 보이게, '없어졌어요'가 많으면 바로 내려가요."}
+                ? r.my_vote === "confirm"
+                  ? "내 표: 아직 있어요 · 다시 보이면 또 눌러 주세요. 없어졌으면 '없어졌어요'를 눌러 주세요"
+                  : "내 표: 없어졌어요 · 다시 보이면 '아직 있어요'로 바꿀 수 있어요"
+                : "'아직 있어요'를 누르면 더 오래 보여요. 있다고 했던 사람이 '없어졌어요'를 누르면 바로 내려가요."}
           </p>
         </section>
       )}
