@@ -14,13 +14,13 @@
   - `github/` ← **저장소** (remote `https://github.com/lyc0620/makerthon`). 4장의 `hyeonpung-map/` 루트가 곧 이 폴더다.
   - `hyeonpung-map-handoff.md` (이 문서의 복사본), `db-integration.md`, `api-spec-db.md` (DB 담당이 준 문서), `.claude/launch.json` (미리보기 서버 설정)
   - 상위 `makerthon/` 폴더에도 커밋 없는 빈 `.git` 이 하나 있다(사용자가 만든 것, 무시해도 됨).
-- 현재 브랜치: **`feat/integration-bus-seminar`**
-  - 푸시된 커밋: `e3f1af4 feat: monorepo skeleton with live bus arrivals and portal seminar crawler` (`origin/feat/integration-bus-seminar`)
-  - `main` 은 `69fcd58 first commit`(README 한 줄)뿐. PR 은 아직 안 만듦.
-- **커밋 안 된 작업 (3D 지도, 사용자 확인 완료, 커밋·푸시 필요)**:
-  - 수정: `docs/handoff.md`(이 문서 v3), `frontend/src/App.tsx`, `frontend/src/components/LayerToggle.tsx`, `frontend/src/map/MapView.tsx`, `frontend/src/store/ui.ts`
-  - 새 파일: `backend/scripts/build_campus_buildings.py`, `frontend/public/data/campus-buildings.geojson`, `frontend/src/layers/CampusBuildingsLayer.tsx`, `frontend/src/map/Map3DSync.tsx`, `frontend/src/map/stylize.ts`
-  - 커밋할 때 `frontend/src/index.css`, `main.tsx` 가 수정으로 잡히면 Prettier 가 줄바꿈만 바꾼 것이라 `git checkout -- frontend/src/index.css frontend/src/main.tsx` 로 되돌린다.
+- 현재 브랜치: **`feat/integration-bus-seminar`** — **모든 작업이 커밋·푸시돼 있다** (2026-11-21, 사용자 요청으로 푸시). 다른 컴퓨터·계정에서는 `git clone` 후 이 브랜치를 체크아웃하면 된다.
+  - `67357bd feat: miniature 3D map with campus buildings, stylized roads and region fade` — 3D 지도 전체 + 이 문서 v3
+  - `e3f1af4 feat: monorepo skeleton with live bus arrivals and portal seminar crawler` — 백엔드·프론트 뼈대, 버스·세미나 수집
+  - 그 뒤에 이 00.1 절만 고친 문서 커밋이 하나 더 있다 ("docs: handoff ..."). `git log --oneline` 으로 확인.
+  - `main` 은 `69fcd58 first commit`(README 한 줄)뿐. **PR 은 아직 안 만듦** (`feat/integration-bus-seminar` → `main`).
+- **git 에 없는 것 (로컬에만, 새 컴퓨터면 다시 만들어야 함)**: `backend/.env`(00.2), `backend/data/`(DB·포탈 쿠키 — 쿠키는 00.6 절차로 다시 업로드), `backend/.venv`, `frontend/node_modules`, `makerthon/.claude/launch.json`(00.2 참고해 다시 만들기), 상위 폴더의 `db-integration.md`·`api-spec-db.md`(DB 담당 문서 — `origin/feat/db-part` 에도 있음).
+- 커밋 전에 `frontend/src/index.css`, `main.tsx` 가 수정으로 잡히면 Prettier 가 줄바꿈만 바꾼 것이라 `git checkout -- frontend/src/index.css frontend/src/main.tsx` 로 되돌린다.
 - 원격의 팀원 브랜치 (아직 **합치지 않음** — 사용자가 "나중에 통합할 때 문제 생길 수 있으니 미루자"고 결정, 한 번 합쳤다가 롤백함):
   - `origin/feat/db-part` (bamfiring: 맛집·경찰 제보·밥친구) — 00.7 참고
   - `origin/feat/dohyeon-route` (김도현: 길찾기·러닝·3D 건물 레이어) — 00.7 참고
@@ -121,7 +121,7 @@
   - 그쪽 문서에 "메인 지도(dohyun님)" 라고 적혀 있으나 실제 MapView 는 통합 담당(나) 소유.
 
 ### 00.8 남은 일 (우선순위)
-1. **3D 작업 커밋·푸시** (00.1 목록). 메시지 예: `feat: miniature 3D map — campus buildings, stylized roads/streams, circular region fade`
+1. ~~3D 작업 커밋·푸시~~ — 완료 (`67357bd`). 다음은 `feat/integration-bus-seminar` → `main` PR 을 만들지 사용자에게 묻기.
 2. 캠퍼스 건물 **실제 층수 확인** → `build_campus_buildings.py` 의 `LEVELS` 수정 후 재실행. E1~E7 을 개별 건물로 나누려면 OSM 윤곽이 없으니 직접 다각형을 만들어야 함(구글·네이버에서 따오지 말 것).
 3. 3D 다듬기 후보: 오목한 건물 지붕 테두리, 캠퍼스 나무·잔디 같은 소품, 횡단보도(OSM crossing), 하늘이 보이게 기본 시점 조정.
 4. 버스 정류장 마커 겹침: 유가읍행정복지센터 앞/건너가 20m 거리라 핀이 겹친다 → 방향 화살표나 오프셋 필요.
@@ -635,7 +635,7 @@ VITE_MAP_STYLE_URL=
 - [x] `BusLayer` + 버스 시트 + 즐겨찾기
 - [x] `SeminarLayer` + 세미나 목록 탭 + 상세 시트 ("종일" 표시 포함)
 - [x] 내 위치 (GeolocateControl)
-- [x] **3D 지도** (00.5) — 커밋 필요
+- [x] **3D 지도** (00.5) — 커밋·푸시 완료 (`67357bd`)
 - [ ] **[중간]** 팀원 레이어(맛집·길찾기·제보·밥친구) 연결
 - [ ] **[중간]** PWA 설정 (아이콘, manifest)
 
@@ -657,7 +657,7 @@ VITE_MAP_STYLE_URL=
 
 ## 12. 다음 Claude 세션에게 — 첫 작업 순서
 
-1. 이 문서 00장을 읽는다. `cd github && git status` 로 00.1 의 미커밋 목록과 같은지 확인한다.
+1. 이 문서 00장을 읽는다. `cd github && git status && git log --oneline -3` 으로 작업 트리가 깨끗하고 00.1 의 커밋이 맞는지 확인한다. 새 컴퓨터라면 00.1 의 "git 에 없는 것"부터 다시 만든다.
 2. 미리보기 서버(`backend`, `frontend`)를 띄우고 브라우저 패널에서 지도를 연다. 3D 토글·확대해서 00.5 의 모습이 나오는지 확인한다.
-3. 사용자에게 3D 작업 커밋·푸시 여부를 묻는다 (00.8-1).
+3. 사용자에게 `main` 으로 PR 을 만들지 묻는다 (00.8-1). 커밋·푸시는 끝나 있다.
 4. 이후 00.8 의 우선순위대로. 3D 는 사용자 피드백을 받으며 다듬는 중이었다 (마지막 요청: 원형 경계·캠퍼스 밖 건물 윤곽만·캠퍼스 예쁘게·내천과 다리 → 모두 반영 완료, 다음 피드백 대기).
