@@ -416,10 +416,15 @@ hyeonpung-map/
 - `type`: `"room"` | `"building"`. `building` 타입이면 `plan`, `x`, `y`, `name`은 `null`
 - `scans`: 그 건물·층의 3D 실내 스캔 목록 (없으면 `[]`). 현재 E8 3층 1개
   ```json
-  "scans": [{ "id": "e8_3f_gs", "title": "3층 아트리움 → 유리벽 복도", "viewer": "splat", "viewer_url": "/splat-viewer?scan=e8_3f_gs" }]
+  "scans": [{ "id": "e8_3f_gs", "title": "3층 아트리움 → 유리벽 복도", "viewer": "splat", "viewer_url": "/api/v1/scans/splat-viewer?scan=e8_3f_gs" }]
   ```
   - `viewer`: `"splat"`(3D 가우시안 스플래팅) | `"points"`(점 구름). 목록은 `seed/scans.json`, 파일은 `backend/static/scans/`
-  - 뷰어 페이지(`/splat-viewer`, `/scan-viewer`)와 `/scans/{파일}`은 지금 dev 서버(`scripts/dev_route_server.py`)에만 있음 → 통합 시 Caddy 정적 서빙 또는 라우터로 옮겨야 함
+  - 프론트는 `viewer_url`을 새 탭으로 열기만 하면 됨
+
+**`routers/scans.py`** (Caddy가 `/api`만 백엔드로 넘기므로 뷰어 페이지도 `/api/v1` 아래)
+- `GET /api/v1/scans/splat-viewer?scan={id}` → 스플랫 뷰어 HTML (`backend/static/viewers/splat.html`)
+- `GET /api/v1/scans/points-viewer?scan={id}` → 점 구름 뷰어 HTML (`backend/static/viewers/points.html`)
+- `GET /api/v1/scans/files/{name}` → `.splat` / `.ply` / `.json` 파일. 파일 이름만 허용, 없으면 404
 
 **`GET /api/v1/campus/floor-plans/{plan_id}/image`** → PNG
 - 학교 서버가 `Cross-Origin-Resource-Policy: same-site`라 브라우저에서 직접 띄울 수 없어 백엔드가 중계 (메모리 캐시). seed에 등록된 안내도만 허용

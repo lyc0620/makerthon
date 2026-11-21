@@ -43,11 +43,11 @@ def get_campus() -> CampusData:
     )
 
 
-_VIEWER_PATH = {"splat": "/splat-viewer", "points": "/scan-viewer"}
+_VIEWER_PATH = {"splat": "/api/v1/scans/splat-viewer", "points": "/api/v1/scans/points-viewer"}
 
 
 def _scans_for(c: CampusData, building_id: str, floor: str | None) -> list[dict]:
-    """그 건물(층을 알면 그 층)의 3D 스캔 목록. viewer_url은 dev 서버 기준 경로."""
+    """그 건물(층을 알면 그 층)의 3D 스캔 목록. viewer_url은 routers/scans.py의 뷰어 페이지."""
     return [
         {
             "id": s["id"],

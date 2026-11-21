@@ -38,7 +38,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { PLYLoader } from "three/addons/loaders/PLYLoader.js";
 
-// ?scan=e8_3f → /scans/e8_3f.ply, /scans/e8_3f.json(제목, 설명)
+// ?scan=e8_3f → /api/v1/scans/files/e8_3f.ply, /scans/e8_3f.json(제목, 설명)
 const scan = new URLSearchParams(location.search).get("scan") || "e8_3f";
 const base = location.protocol.startsWith("http") ? "" : "http://localhost:8000";
 
@@ -67,11 +67,11 @@ function fit(geom) {
   home = { pos: camera.position.clone(), target: center.clone() };
 }
 
-fetch(`${base}/scans/${scan}.json`).then(r => r.ok ? r.json() : null).then(meta => {
+fetch(`${base}/api/v1/scans/files/${scan}.json`).then(r => r.ok ? r.json() : null).then(meta => {
   if (meta) document.getElementById("title").textContent = meta.title;
 }).catch(() => {});
 
-new PLYLoader().load(`${base}/scans/${scan}.ply`, (geom) => {
+new PLYLoader().load(`${base}/api/v1/scans/files/${scan}.ply`, (geom) => {
   // prepare_scan.py가 이미 +Y가 위가 되도록 회전해 둠
   scene.add(new THREE.Points(geom, material));
   fit(geom);

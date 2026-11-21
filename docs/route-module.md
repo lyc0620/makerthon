@@ -30,10 +30,12 @@
 
 백엔드 `main.py`:
 ```python
-from app.routers import campus, route
+from app.routers import campus, route, scans
 app.include_router(route.router, prefix="/api/v1")
 app.include_router(campus.router, prefix="/api/v1")
+app.include_router(scans.router, prefix="/api/v1")  # 3D 스캔 뷰어 페이지 + 파일
 ```
+- 데모 서버(`scripts/dev_route_server.py`)도 이 세 라우터를 그대로 쓰고, 데모 지도 페이지(`/`)만 따로 가집니다.
 - 세미나 담당: `seed/buildings.json`의 `aliases`로 장소 텍스트를 매칭하면 됩니다 (명세 6.1).
 - 에러는 라우터가 직접 `{"error": {"code", "message"}}` 형식으로 반환한다. 쿼리 검증 실패(422)는 전역 핸들러가 바꿔 주면 된다.
 - 그래프는 첫 요청 때 메모리에 올라간다 (0.01초). 경로 `WALK_GRAPH_PATH` 환경변수로 변경 가능.
@@ -80,7 +82,8 @@ python -m pytest tests/
 | `backend/scripts/train_gsplat.py` | gsplat 학습 (fused-ssim 대신 PyTorch SSIM). gsplat 1.5.3 + torch 2.4.1 cu124 Windows 휠 사용 |
 | `backend/scripts/ply_to_splat.py` | 3DGS PLY → `.splat` (불투명도 0.05 미만 제거, 154MB → 13.8MB) |
 | `backend/scripts/prepare_scan.py` | COLMAP 점 구름 → 뷰어용 PLY (중력 방향 정렬, 다운샘플) |
-| `backend/scripts/splat_viewer.html`, `scan_viewer.html` | 스플랫 / 점 구름 뷰어 (dev 서버 `/splat-viewer`, `/scan-viewer`) |
+| `backend/app/routers/scans.py` | 뷰어 페이지 `/api/v1/scans/splat-viewer`, `/points-viewer`, 파일 `/api/v1/scans/files/{name}` |
+| `backend/static/viewers/splat.html`, `points.html` | 스플랫 / 점 구름 뷰어 페이지 |
 | `backend/seed/scans.json`, `backend/static/scans/` | 스캔 목록과 파일 (`e8_3f_gs.splat` 13.8MB) |
 
 - 결과: E8 3층 아트리움 → 유리벽 복도 (영상 2~67초, 325장). 학습 뷰 PSNR 약 26.7dB

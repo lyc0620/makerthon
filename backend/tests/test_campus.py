@@ -46,7 +46,7 @@ def test_scan_attached_to_e8_third_floor():
     it = search("E8 301")[0]
     assert it["building"]["id"] == "bld_E8" and it["floor"] == "3"
     assert [s["id"] for s in it["scans"]] == ["e8_3f_gs"]
-    assert it["scans"][0]["viewer_url"] == "/splat-viewer?scan=e8_3f_gs"
+    assert it["scans"][0]["viewer_url"] == "/api/v1/scans/splat-viewer?scan=e8_3f_gs"
     assert search("도서관")[0]["scans"]  # 층 모르는 건물 검색도 스캔 연결
     assert search("E8 201")[0]["scans"] == []  # 다른 층은 없음
     assert search("L21")[0]["scans"] == []

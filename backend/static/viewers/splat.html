@@ -29,14 +29,14 @@
 <script type="module">
 import * as GS from "@mkkellogg/gaussian-splats-3d";
 
-// ?scan=e8_3f_gs → /scans/e8_3f_gs.ply (+ .json: up, center)
+// ?scan=e8_3f_gs → /api/v1/scans/files/e8_3f_gs.ply (+ .json: up, center)
 const scan = new URLSearchParams(location.search).get("scan") || "e8_3f_gs";
 const base = location.protocol.startsWith("http") ? "" : "http://localhost:8000";
 const status = (t) => { document.getElementById("status").textContent = t; };
 
 let meta = { up: [0, -1, 0], center: [0, 0, 0] };
 try {
-  const r = await fetch(`${base}/scans/${scan}.json`);
+  const r = await fetch(`${base}/api/v1/scans/files/${scan}.json`);
   if (r.ok) meta = { ...meta, ...(await r.json()) };
 } catch {}
 if (meta.title) document.getElementById("title").textContent = meta.title;
@@ -54,7 +54,7 @@ const viewer = new GS.Viewer({
 });
 // meta.format === "splat" 이면 경량 .splat (ply_to_splat.py 변환본), 아니면 원본 .ply
 const isSplat = meta.format === "splat";
-viewer.addSplatScene(`${base}/scans/${scan}.${isSplat ? "splat" : "ply"}`, {
+viewer.addSplatScene(`${base}/api/v1/scans/files/${scan}.${isSplat ? "splat" : "ply"}`, {
   format: isSplat ? GS.SceneFormat.Splat : GS.SceneFormat.Ply,
   showLoadingUI: true,
   progressiveLoad: true,
