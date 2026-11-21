@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>현풍 길찾기 데모</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: #fff; }
+  #map { position: absolute; inset: 0; }
+  #panel {
+    position: absolute; top: 12px; left: 12px; right: 12px; max-width: 360px;
+    background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.18);
+    padding: 12px; font-size: 14px; z-index: 1;
+  }
+  .tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+  .tabs button, .row button {
+    flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 8px; background: #f6f6f6; cursor: pointer;
+  }
+  .tabs button.on { background: #2563eb; color: #fff; border-color: #2563eb; }
+  .row { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+  .row input[type=number] { width: 70px; padding: 6px; }
+  #msg { margin-top: 8px; color: #333; line-height: 1.5; }
+  .course { padding: 6px 8px; border-radius: 6px; margin-top: 4px; cursor: pointer; border-left: 6px solid; background: #f8f8f8; }
+  .course.sel { background: #e8efff; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="panel">
+  <div class="tabs">
+    <button id="tab-route" class="on">길찾기</button>
+    <button id="tab-run">러닝 코스</button>
+  </div>
+  <div id="route-ui">
+    <div class="row">
+      <label><input type="radio" name="mode" value="walk" checked /> 걷기</label>
+      <label><input type="radio" name="mode" value="run" /> 달리기</label>
+      <button id="clear">초기화</button>
+    </div>
+  </div>
+  <div id="run-ui" hidden>
+    <div class="row">
+      목표 <input id="km" type="number" min="1" max="21" step="0.5" value="5" /> km
+      <button id="go">코스 추천</button>
+    </div>
+  </div>
+  <div class="row"><label><input id="three" type="checkbox" /> 3D 건물</label></div>
+  <div id="msg">지도에서 출발지를 클릭하세요.</div>
+</div>
+<script>
+const API = "/api/v1";
+const COLORS = ["#2563eb", "#16a34a", "#ea580c"];
+let tab = "route", from = null, runStart = [35.7003, 128.4576], courses = [], selected = 0;
+const markers = [];
+
+const map = new maplibregl.Map({
+  container: "map",
+  style: "https://tiles.openfreemap.org/styles/liberty",
+  center: [128.4565, 35.7020],
+  zoom: 15,
+});
+map.addControl(new maplibregl.NavigationControl(), "bottom-right");
+
+map.on("load", () => {
+  map.addSource("route", { type: "geojson", data: { type: "FeatureCollection", features: lastFeatures } });
+  map.addLayer({ id: "route-casing", type: "line", source: "route",
+    layout: { "line-join": "round", "line-cap": "round" },
+    paint: { "line-color": "#fff", "line-width": ["case", ["get", "sel"], 10, 6] } });
+  map.addLayer({ id: "route-line", type: "line", source: "route",
+    layout: { "line-join": "round", "line-cap": "round" },
+    paint: { "line-color": ["get", "color"], "line-width": ["case", ["get", "sel"], 6, 3],
+             "line-opacity": ["case", ["get", "sel"], 1, 0.55] } });
+
+  // 3D 건물 (Buildings3DLayer와 같은 방식)
+  const src = Object.keys(map.getStyle().sources).find(k => map.getStyle().sources[k].type === "vector");
+  map.addLayer({ id: "buildings-3d", type: "fill-extrusion", source: src, "source-layer": "building",
+    minzoom: 14, layout: { visibility: "none" },
+    paint: { "fill-extrusion-color": "#d6d3d1",
+             "fill-extrusion-height": ["coalesce", ["get", "render_height"], 6],
+             "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], 0],
+             "fill-extrusion-opacity": 0.85 } });
+});
+
+function msg(html) { document.getElementById("msg").innerHTML = html; }
+function clearMarkers() { while (markers.length) markers.pop().remove(); }
+function addMarker(lat, lng, color) {
+  markers.push(new maplibregl.Marker({ color }).setLngLat([lng, lat]).addTo(map));
+}
+let lastFeatures = [];
+function draw(features) {
+  lastFeatures = features;
+  const src = map.getSource("route");  // 스타일 로드 전이면 아직 없음 → load 때 lastFeatures로 그림
+  if (src) src.setData({ type: "FeatureCollection", features });
+}
+function fmtMin(s) { return Math.round(s / 60) + "분"; }
+
+async function api(path) {
+  const r = await fetch(API + path);
+  const body = await r.json();
+  if (!r.ok) throw new Error(body.error ? body.error.message : r.statusText);
+  return body;
+}
+
+map.on("click", async (e) => {
+  const { lat, lng } = e.lngLat;
+  if (tab === "run") {
+    runStart = [lat, lng];
+    clearMarkers(); addMarker(lat, lng, "#111");
+    msg("출발점을 바꿨습니다. <b>코스 추천</b>을 누르세요.");
+    return;
+  }
+  if (!from) {
+    clearMarkers(); draw([]);
+    from = [lat, lng]; addMarker(lat, lng, "#16a34a");
+    msg("도착지를 클릭하세요.");
+    return;
+  }
+  addMarker(lat, lng, "#dc2626");
+  const mode = document.querySelector("input[name=mode]:checked").value;
+  msg("경로 계산 중...");
+  try {
+    const r = await api(`/route?from=${from[0]},${from[1]}&to=${lat},${lng}&mode=${mode}`);
+    draw([{ type: "Feature", geometry: r.geometry, properties: { color: COLORS[0], sel: true } }]);
+    msg(`<b>${(r.distance_m / 1000).toFixed(2)}km</b> · ${mode === "run" ? "달리기" : "걷기"} 약 <b>${fmtMin(r.duration_s)}</b><br/>다시 클릭하면 새 출발지`);
+  } catch (err) { msg("⚠ " + err.message); }
+  from = null;
+});
+
+function renderCourses() {
+  draw(courses.map((c, i) => ({ type: "Feature", geometry: c.geometry,
+    properties: { color: COLORS[i % 3], sel: i === selected } })));
+  msg(courses.length ? courses.map((c, i) =>
+    `<div class="course ${i === selected ? "sel" : ""}" style="border-color:${COLORS[i % 3]}" data-i="${i}">
+       <b>${c.name}</b> · ${(c.distance_m / 1000).toFixed(2)}km · 신호등 ${c.signal_count ?? "-"}개
+     </div>`).join("") : "조건에 맞는 코스가 없습니다. 거리를 바꿔 보세요.");
+  document.querySelectorAll(".course").forEach(el =>
+    el.onclick = () => { selected = +el.dataset.i; renderCourses(); });
+}
+
+document.getElementById("go").onclick = async () => {
+  const km = document.getElementById("km").value;
+  msg("코스 찾는 중...");
+  try {
+    const r = await api(`/running-routes?distance_km=${km}&lat=${runStart[0]}&lng=${runStart[1]}`);
+    courses = r.items; selected = 0;
+    clearMarkers(); addMarker(runStart[0], runStart[1], "#111");
+    renderCourses();
+  } catch (err) { msg("⚠ " + err.message); }
+};
+
+function setTab(t) {
+  tab = t; from = null; courses = []; clearMarkers(); draw([]);
+  document.getElementById("tab-route").classList.toggle("on", t === "route");
+  document.getElementById("tab-run").classList.toggle("on", t === "run");
+  document.getElementById("route-ui").hidden = t !== "route";
+  document.getElementById("run-ui").hidden = t !== "run";
+  if (t === "run") { addMarker(runStart[0], runStart[1], "#111"); msg("지도 클릭으로 출발점 변경 (기본: DGIST 정문)"); }
+  else msg("지도에서 출발지를 클릭하세요.");
+}
+document.getElementById("tab-route").onclick = () => setTab("route");
+document.getElementById("tab-run").onclick = () => setTab("run");
+document.getElementById("clear").onclick = () => setTab("route");
+document.getElementById("three").onchange = (e) => {
+  if (map.getLayer("buildings-3d"))
+    map.setLayoutProperty("buildings-3d", "visibility", e.target.checked ? "visible" : "none");
+  map.easeTo({ pitch: e.target.checked ? 45 : 0, duration: 600 });
+};
+</script>
+</body>
+</html>
