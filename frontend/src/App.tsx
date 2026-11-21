@@ -9,6 +9,9 @@ import TabBar from './components/TabBar'
 import BusLayer from './layers/BusLayer'
 import CampusBuildingsLayer from './layers/CampusBuildingsLayer'
 import { MeetupLayer } from './layers/MeetupLayer'
+import { RoomLayer } from './layers/RoomLayer'
+import { RouteLayer } from './layers/RouteLayer'
+import { RunningLayer } from './layers/RunningLayer'
 import { PresenceLayer } from './layers/PresenceLayer'
 import { ReportLayer } from './layers/ReportLayer'
 import { RestaurantLayer } from './layers/RestaurantLayer'
@@ -20,7 +23,7 @@ import BusFavoritesTab from './tabs/BusFavoritesTab'
 import SeminarListTab from './tabs/SeminarListTab'
 
 // 지도가 보이는 탭 (세미나·버스 탭은 지도를 덮는 목록 화면)
-const MAP_TABS = new Set(['map', 'restaurant', 'meetup', 'report'])
+const MAP_TABS = new Set(['map', 'restaurant', 'meetup', 'report', 'route'])
 
 export default function App() {
   const layers = useUi((s) => s.layers)
@@ -28,6 +31,8 @@ export default function App() {
   const setTab = useUi((s) => s.setTab)
   const select = useUi((s) => s.select)
   const showHotspots = useDbNavStore((s) => s.showHotspots)
+  const navMode = useUi((s) => s.navMode)
+  const navOpen = tab === 'route'
 
   // DB 파트: 실시간 알림 웹소켓(로그인하면 토큰을 붙여 다시 연결) + "지금 밥 먹을래요" 위치 신호
   useRealtime()
@@ -47,6 +52,10 @@ export default function App() {
           <MeetupLayer visible={layers.meetup} onSelect={select} />
           <ReportLayer visible={layers.report} onSelect={select} showHotspots={showHotspots} />
           <PresenceLayer visible={layers.meetup} onSelect={select} />
+          {/* 길찾기·러닝·강의실 (김도현): 길찾기 패널의 해당 화면이 열려 있을 때만 (지도 클릭을 쓰므로) */}
+          <RouteLayer visible={navOpen && navMode === 'route'} />
+          <RunningLayer visible={navOpen && navMode === 'run'} />
+          <RoomLayer visible={navOpen && navMode === 'room'} />
         </MapView>
 
         {MAP_TABS.has(tab) && (
@@ -55,18 +64,28 @@ export default function App() {
             <AccountButton />
           </div>
         )}
-        {/* 경찰 제보는 지도에서 하는 기능이라 하단 탭 대신 지도 위 버튼으로 연다 */}
+        {/* 경찰 제보·길찾기는 지도에서 하는 기능이라 하단 탭 대신 지도 위 버튼으로 연다 */}
         {tab === 'map' && (
-          <button
-            type="button"
-            onClick={() => {
-              select(null)
-              setTab('report')
-            }}
-            className="press absolute bottom-6 left-4 z-10 flex items-center gap-1.5 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-slate-800 shadow-float"
-          >
-            <span aria-hidden>🚨</span> 제보
-          </button>
+          <div className="absolute bottom-6 left-4 z-10 flex gap-2">
+            {(
+              [
+                ['report', '🚨', '제보'],
+                ['route', '🧭', '길찾기'],
+              ] as const
+            ).map(([key, icon, label]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => {
+                  select(null)
+                  setTab(key)
+                }}
+                className="press flex items-center gap-1.5 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-slate-800 shadow-float"
+              >
+                <span aria-hidden>{icon}</span> {label}
+              </button>
+            ))}
+          </div>
         )}
         {tab === 'seminars' && <SeminarListTab />}
         {tab === 'bus' && <BusFavoritesTab />}

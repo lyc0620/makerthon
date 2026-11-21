@@ -7,8 +7,8 @@ const TABS: { key: Tab; label: string; icon: string }[] = [
   { key: 'seminars', label: '세미나', icon: '🎤' },
   { key: 'bus', label: '버스', icon: '⭐' },
 ]
-// 지도 위 "제보" 버튼으로 연 화면은 하단 탭에서는 '지도'로 보인다
-const shownTab = (t: Tab): Tab => (t === 'report' ? 'map' : t)
+// 지도 위 "제보"·"길찾기" 버튼으로 연 화면은 하단 탭에서는 '지도'로 보인다
+const shownTab = (t: Tab): Tab => (t === 'report' || t === 'route' ? 'map' : t)
 
 export default function TabBar() {
   const tab = useUi((s) => s.tab)

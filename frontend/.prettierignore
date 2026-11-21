@@ -19,3 +19,12 @@ src/sheets/ReportSheet.tsx
 src/sheets/MeetupSheet.tsx
 src/sheets/PresenceSheet.tsx
 src/store/db.ts
+# 길찾기·강의실 (김도현)
+src/api/routeTypes.ts
+src/api/hooks/useRoute.ts
+src/layers/RouteLayer.tsx
+src/layers/RunningLayer.tsx
+src/layers/RoomLayer.tsx
+src/sheets/RoutePanel.tsx
+src/sheets/RoomSearchPanel.tsx
+src/store/route.ts

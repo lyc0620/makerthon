@@ -12,7 +12,9 @@ export type SelectedItem =
 
 export type LayerKey = 'bus' | 'seminar' | 'restaurant' | 'route' | 'report' | 'meetup'
 // 'report' 는 하단 탭이 아니라 지도 위 "제보" 버튼으로 연다 (하단 탭에서는 '지도'로 표시)
-export type Tab = 'map' | 'restaurant' | 'meetup' | 'seminars' | 'bus' | 'report'
+export type Tab = 'map' | 'restaurant' | 'meetup' | 'seminars' | 'bus' | 'report' | 'route'
+// 'route'(길찾기) 패널 안의 화면: 길찾기 · 러닝 코스 · 강의실 검색
+export type NavMode = 'route' | 'run' | 'room'
 
 type UiState = {
   layers: Record<LayerKey, boolean>
@@ -23,6 +25,8 @@ type UiState = {
 
   tab: Tab
   setTab: (tab: Tab) => void
+  navMode: NavMode
+  setNavMode: (m: NavMode) => void
 
   // 버스 즐겨찾기: localStorage 에만 저장 (로그인 불필요)
   favoriteStops: string[]
@@ -64,6 +68,8 @@ export const useUi = create<UiState>()(
 
       tab: 'map',
       setTab: (tab) => set({ tab }),
+      navMode: 'route',
+      setNavMode: (navMode) => set({ navMode }),
 
       favoriteStops: [],
       toggleFavoriteStop: (id) =>

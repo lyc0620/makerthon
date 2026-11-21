@@ -30,6 +30,12 @@ extend-exclude = ["alembic/versions"]
 select = ["E", "F", "I", "UP", "B"]
 ignore = ["E501", "B008"]  # 줄 길이는 formatter 가 담당 / B008: FastAPI Depends 기본값
 
+[tool.ruff.lint.per-file-ignores]
+# 3D 스캔 학습·변환 스크립트(김도현): 수식 변수 l(길이) 그대로 둔다
+"scripts/train_gsplat.py" = ["E741"]
+"scripts/prepare_scan.py" = ["E741"]
+"tests/test_route.py" = ["UP031"]
+
 [tool.ruff.lint.isort]
 known-third-party = ["alembic"]
 

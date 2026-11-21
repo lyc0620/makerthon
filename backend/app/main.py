@@ -19,12 +19,15 @@ from app.routers import (
     admin,
     buildings,
     bus,
+    campus,
     dev_auth,
     health,
     meetups,
     presence,
     reports,
     restaurants,
+    route,
+    scans,
     seminars,
 )
 from app.scheduler import build_scheduler, crawl_seminars, refresh_bus
@@ -116,6 +119,9 @@ def create_app() -> FastAPI:
     )
     install_error_handlers(app)
     for r in (health.router, buildings.router, bus.router, seminars.router, admin.router):
+        app.include_router(r, prefix="/api/v1")
+    # 길찾기·러닝 코스, 강의실 검색, 3D 실내 스캔 뷰어 (김도현)
+    for r in (route.router, campus.router, scans.router):
         app.include_router(r, prefix="/api/v1")
     # DB 파트 라우터는 경로에 /api/v1 을 이미 포함한다
     for r in (restaurants.router, reports.router, meetups.router, presence.router):

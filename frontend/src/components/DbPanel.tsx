@@ -4,6 +4,7 @@
 import { useState } from 'react'
 
 import { MeetupPanel } from '../panels/MeetupPanel'
+import NavPanel from './NavPanel'
 import { ReportPanel } from '../panels/ReportPanel'
 import { RestaurantPanel } from '../panels/RestaurantPanel'
 import { usePickStore } from '../store/db'
@@ -13,6 +14,7 @@ const TITLES: Partial<Record<Tab, string>> = {
   restaurant: '🍜 맛집',
   meetup: '🍚 밥친구',
   report: '🚨 경찰 제보',
+  route: '🧭 길찾기',
 }
 
 export default function DbPanel() {
@@ -22,7 +24,7 @@ export default function DbPanel() {
   const stopPick = usePickStore((s) => s.stop)
   const [collapsed, setCollapsed] = useState(false)
 
-  if (tab !== 'restaurant' && tab !== 'meetup' && tab !== 'report') return null
+  if (!(tab in TITLES)) return null
 
   // 위치 찍기 중에는 패널을 숨기고 안내 띠만 보인다.
   // 패널을 언마운트하면 폼이 사라지며 찍기 모드도 취소되므로(useCancelPickOnUnmount) 숨기기만 한다.
@@ -67,11 +69,11 @@ export default function DbPanel() {
               {TITLES[tab]}
             </span>
           </button>
-          {tab === 'report' && (
+          {(tab === 'report' || tab === 'route') && (
             <button
               type="button"
               onClick={() => setTab('map')}
-              aria-label="제보 닫기"
+              aria-label="닫기"
               className="rounded-full px-2 text-xl leading-none text-slate-400"
             >
               ×
@@ -83,6 +85,7 @@ export default function DbPanel() {
             {tab === 'restaurant' && <RestaurantPanel />}
             {tab === 'meetup' && <MeetupPanel />}
             {tab === 'report' && <ReportPanel />}
+            {tab === 'route' && <NavPanel />}
           </div>
         )}
       </section>

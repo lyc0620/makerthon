@@ -109,6 +109,15 @@
 - 예시 데이터: `uv run python -m seed.db_sample` (모두 "[예시]"). 예시 제보는 만료된 기록뿐이라 지도엔 안 뜸.
 - 남은 것: 그쪽 파일의 oxlint 경고 9개(동작 문제 없음), 루프·웹소켓 다중 워커 불가(워커 1개 전제 유지), `feat/dohyeon-route` 통합.
 
+### 00.6.2 길찾기 통합 완료 (2026-11-21, 같은 브랜치)
+`origin/feat/dohyeon-route`(90a5110 까지)를 머지했다. 김도현 문서: `docs/dohyeon-work-summary.md`, `docs/route-module.md`.
+- **지운 것 (사용자 결정: 지도는 우리 MapView 하나)**: `scripts/route_demo.html`, `scripts/dev_route_server.py`(단독 데모 지도 + three.js E7 모델), `frontend/src/layers/Buildings3DLayer.tsx`, 루트의 `hyeonpung-map-handoff.md`(v2 원본 사본).
+- 백엔드: `route`, `campus`, `scans` 라우터를 `/api/v1` 로. 테스트 198개. 안내도 이미지 중계는 학교 사이트 실패 시 1회 재시도.
+- `seed/buildings.json`: 이제 `scripts/build_campus_seed.py` 의 `BUILDINGS` 표가 원본(21동, 목록 형식, `code` 칸 포함). E2~E8·R1~R3 좌표와 학과명 별칭은 우리 값으로 넣었다. `seed_loader._items` 는 `{"items": []}`·`[]` 둘 다 읽고 모델에 없는 칸은 버린다.
+- 프론트: 지도 위 "🧭 길찾기" 버튼(`tab='route'`) → `DbPanel` 안의 `NavPanel` (길찾기·러닝 코스·강의실). 레이어는 해당 화면이 열려 있을 때만 보이고 지도 클릭을 받는다. 강의실에서 "여기까지 길찾기" → 길찾기 화면으로 자동 전환. 훅은 공통 `api/client.ts`, 출발·도착·러닝 시작·강의실 표시는 `MapPin`.
+- 팀원 파일은 `frontend/.prettierignore` 로 그쪽 포맷 유지. ruff 는 학습 스크립트 E741, test_route UP031 만 파일별 예외.
+- 남은 것: 경사(DEM) 미반영(`ascent_m` null), 길찾기 패널 디자인은 그쪽 기본 스타일 그대로, 스캔 파일 약 25MB 가 저장소에 있음.
+
 ### 00.7 팀원 브랜치 통합 메모 (다음에 합칠 때 그대로 쓰기)
 **`feat/dohyeon-route` (김도현)** — 우리와 겹치는 파일은 빈 `__init__.py` 와 README 뿐, 거의 그대로 합쳐진다(한 번 해 봤음).
 - 백엔드: `app/routers/route.py`(`GET /route`, `GET /running-routes`), `app/services/route/graph.py`(표준 라이브러리 Dijkstra), `seed/walk_graph.json`(노드 6,233), `scripts/build_walk_graph.py`, `tests/test_route.py`. main 에서 `app.include_router(route.router, prefix="/api/v1")`.
