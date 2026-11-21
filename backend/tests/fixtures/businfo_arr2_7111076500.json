@@ -1,0 +1,45 @@
+{
+ "header": {
+  "success": true,
+  "resultCode": "0000",
+  "resultMsg": "성공"
+ },
+ "body": {
+  "block": false,
+  "list": [
+   {
+    "routeNo": "급행8",
+    "arrList": [
+     {
+      "routeId": "1000008004",
+      "routeNo": "급행8",
+      "moveDir": "1",
+      "bsGap": 4,
+      "bsNm": "한국제지건너",
+      "crfId": 1645615143,
+      "vhcNo2": "1827",
+      "busTCd2": "N",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "6분",
+      "prevBsGap": 3
+     },
+     {
+      "routeId": "1000008004",
+      "routeNo": "급행8",
+      "moveDir": "1",
+      "bsGap": 10,
+      "bsNm": "구지읍행정복지센터건너",
+      "crfId": 1645615129,
+      "vhcNo2": "1819",
+      "busTCd2": "N",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "16분",
+      "prevBsGap": 3
+     }
+    ]
+   }
+  ]
+ }
+}

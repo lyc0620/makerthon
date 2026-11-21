@@ -1,0 +1,139 @@
+{
+ "header": {
+  "success": true,
+  "resultCode": "0000",
+  "resultMsg": "성공"
+ },
+ "body": {
+  "block": false,
+  "list": [
+   {
+    "routeNo": "665",
+    "arrList": [
+     {
+      "routeId": "3000665000",
+      "routeNo": "665",
+      "routeNote": "달성2차산단방면",
+      "routeNoteOrigin": "달성2차산단-대천동",
+      "moveDir": "0",
+      "bsGap": 1,
+      "bsNm": "제일풍경채건너",
+      "crfId": 1645623361,
+      "vhcNo2": "3841",
+      "busTCd2": "D",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "전",
+      "prevBsGap": 1
+     },
+     {
+      "routeId": "3000665000",
+      "routeNo": "665",
+      "routeNote": "달성2차산단방면",
+      "routeNoteOrigin": "달성2차산단-대천동",
+      "moveDir": "0",
+      "bsGap": 19,
+      "bsNm": "위천삼거리(현풍방향)",
+      "crfId": 1645623297,
+      "vhcNo2": "3801",
+      "busTCd2": "D",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "30분",
+      "prevBsGap": 3
+     }
+    ]
+   },
+   {
+    "routeNo": "직행2",
+    "arrList": [
+     {
+      "routeId": "5000002000",
+      "routeNo": "직행2",
+      "moveDir": "1",
+      "bsGap": 1,
+      "bsNm": "과학마을청아람앞",
+      "crfId": 1645482804,
+      "vhcNo2": "1334",
+      "busTCd2": "D",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "18분",
+      "prevBsGap": 1
+     }
+    ]
+   },
+   {
+    "routeNo": "급행8",
+    "arrList": [
+     {
+      "routeId": "1000008004",
+      "routeNo": "급행8",
+      "moveDir": "1",
+      "bsGap": 2,
+      "bsNm": "한국제지건너",
+      "crfId": 1645615143,
+      "vhcNo2": "1827",
+      "busTCd2": "N",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "전전",
+      "prevBsGap": 2
+     },
+     {
+      "routeId": "1000008004",
+      "routeNo": "급행8",
+      "moveDir": "1",
+      "bsGap": 8,
+      "bsNm": "구지읍행정복지센터건너",
+      "crfId": 1645615129,
+      "vhcNo2": "1819",
+      "busTCd2": "N",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "13분",
+      "prevBsGap": 3
+     }
+    ]
+   },
+   {
+    "routeNo": "급행8-1",
+    "arrList": [
+     {
+      "routeId": "1000008101",
+      "routeNo": "급행8-1",
+      "moveDir": "1",
+      "bsGap": 8,
+      "bsNm": "유곡리공영차고지앞",
+      "crfId": 1645482824,
+      "vhcNo2": "1348",
+      "busTCd2": "N",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "10분",
+      "prevBsGap": 3
+     }
+    ]
+   },
+   {
+    "routeNo": "달성5",
+    "arrList": [
+     {
+      "routeId": "4040005003",
+      "routeNo": "달성5",
+      "routeNote": "대곡-용연사-유곡1-유가사",
+      "moveDir": "1",
+      "bsGap": 22,
+      "bsNm": "설티고개(달성공단방면)",
+      "vhcNo2": "1802",
+      "busTCd2": "N",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "41분",
+      "prevBsGap": 3
+     }
+    ]
+   }
+  ]
+ }
+}

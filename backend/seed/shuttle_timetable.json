@@ -1,0 +1,11 @@
+{
+  "_note": "교내 셔틀 시간표. 셔틀 정류장을 bus_stops.json 에 추가한 뒤 아래 형식으로 채운다. days: mon..sun",
+  "_example": {
+    "route": "교내 셔틀",
+    "stop_id": "stop_xxx",
+    "direction": "현풍터미널",
+    "days": ["mon", "tue", "wed", "thu", "fri"],
+    "times": ["08:00", "08:30"]
+  },
+  "routes": []
+}

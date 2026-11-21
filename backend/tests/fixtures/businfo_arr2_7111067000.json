@@ -1,0 +1,164 @@
+{
+ "header": {
+  "success": true,
+  "resultCode": "0000",
+  "resultMsg": "성공"
+ },
+ "body": {
+  "block": false,
+  "list": [
+   {
+    "routeNo": "직행2",
+    "arrList": [
+     {
+      "routeId": "5000002000",
+      "routeNo": "직행2",
+      "moveDir": "0",
+      "bsGap": 1,
+      "bsNm": "2.28기념중앙공원건너1",
+      "crfId": 1644241014,
+      "vhcNo2": "2076",
+      "busTCd2": "D",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "곧 도착",
+      "prevBsGap": 1
+     },
+     {
+      "routeId": "5000002000",
+      "routeNo": "직행2",
+      "moveDir": "0",
+      "bsGap": 1,
+      "bsNm": "2.28기념중앙공원건너1",
+      "crfId": 1644241017,
+      "vhcNo2": "2079",
+      "busTCd2": "N",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "30분",
+      "prevBsGap": 1
+     }
+    ]
+   },
+   {
+    "routeNo": "급행8-1",
+    "arrList": [
+     {
+      "routeId": "1000008101",
+      "routeNo": "급행8-1",
+      "moveDir": "0",
+      "bsGap": 3,
+      "bsNm": "수목원삼성래미안1차앞",
+      "crfId": 1646016291,
+      "vhcNo2": "3723",
+      "busTCd2": "N",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "5분",
+      "prevBsGap": 3
+     },
+     {
+      "routeId": "1000008101",
+      "routeNo": "급행8-1",
+      "moveDir": "0",
+      "bsGap": 4,
+      "bsNm": "진천역(1번출구)",
+      "crfId": 1645482758,
+      "vhcNo2": "1306",
+      "busTCd2": "N",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "13분",
+      "prevBsGap": 3
+     }
+    ]
+   },
+   {
+    "routeNo": "급행8",
+    "arrList": [
+     {
+      "routeId": "1000008004",
+      "routeNo": "급행8",
+      "moveDir": "0",
+      "bsGap": 3,
+      "bsNm": "수목원삼성래미안1차앞",
+      "crfId": 1646016311,
+      "vhcNo2": "3737",
+      "busTCd2": "N",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "11분",
+      "prevBsGap": 3
+     },
+     {
+      "routeId": "1000008004",
+      "routeNo": "급행8",
+      "moveDir": "0",
+      "bsGap": 5,
+      "bsNm": "월배역(4번출구)",
+      "crfId": 1646016288,
+      "vhcNo2": "3720",
+      "busTCd2": "N",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "17분",
+      "prevBsGap": 3
+     }
+    ]
+   },
+   {
+    "routeNo": "665",
+    "arrList": [
+     {
+      "routeId": "3000665000",
+      "routeNo": "665",
+      "routeNote": "대천방면",
+      "routeNoteOrigin": "달성2차산단-대천동",
+      "moveDir": "1",
+      "bsGap": 7,
+      "bsNm": "신기리2",
+      "crfId": 1645623368,
+      "vhcNo2": "3848",
+      "busTCd2": "D",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "13분",
+      "prevBsGap": 3
+     },
+     {
+      "routeId": "3000665000",
+      "routeNo": "665",
+      "routeNote": "달성2차산단-대천동",
+      "moveDir": "1",
+      "bsGap": 21,
+      "bsNm": "구지축구장앞",
+      "vhcNo2": "3849",
+      "busTCd2": "D",
+      "busTCd3": "N",
+      "busAreaCd": "DG",
+      "arrState": "32분",
+      "prevBsGap": 3
+     }
+    ]
+   },
+   {
+    "routeNo": "달성5",
+    "arrList": [
+     {
+      "routeId": "4040005071",
+      "routeNo": "달성5",
+      "routeNote": "현풍>용연사>대곡방면",
+      "moveDir": "1",
+      "bsGap": -2,
+      "bsNm": "13:55 기점출발예정",
+      "busTCd2": "N",
+      "busTCd3": "N",
+      "busAreaCd": "-ST",
+      "arrState": "기점출발예정",
+      "prevBsGap": 3
+     }
+    ]
+   }
+  ]
+ }
+}
